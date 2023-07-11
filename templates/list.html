@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block title %}
+ List page
+{% endblock %}
+{% block intro %}
+List page
+{% endblock %}
+{% block content %}
+   <style>
+    .container {
+      display: flex;
+      justify-content: flex-start; /* Aligns content to the left */
+      align-items: flex-start;
+      height: 100vh;
+    }
+
+    .table td,
+    .table th {
+      border: 1px solid white;
+    }
+    .mark-square {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      background-color: white; /* Change to the desired color for the square */
+    }
+    .marked td {
+      position: relative;
+    }
+
+    .marked td::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: white;
+      transform: translateY(-50%);
+    }
+
+   </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+      const squares = document.querySelectorAll(".mark-square");
+
+      squares.forEach(square => {
+        square.addEventListener("click", function() {
+          const row = this.closest("tr");
+          row.classList.toggle("marked");
+        });
+      });
+    });
+    </script>
+
+   <div class="container">
+    <table class="table table-bordered table-dark">
+      <thead>
+       <tr>
+        <th>ITEM NUMBER</th>
+         <th>TYPE</th>
+         <th>MARK</th>
+       </tr>
+      </thead>
+      <tbody>
+      {% for item in items %}
+        <tr data-toggle="stripe">
+          <td>{{ item.id }}</td>
+          <td>{{ item.type }}</td>
+          <td><div class="mark-square"></div></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+   <style>
+    body{
+    background-color: #212121;
+    color: white;
+    }
+     .container {
+      width: 60%; /* Adjust the width as needed */
+      margin-top: 50px; /* Adjust the margin-top as needed */
+    }
+
+    .table td,
+    .table th {
+      border: 1px solid white;
+    }
+
+    .marked {
+      background-color: #343a40;
+   </style>
+   </div>
+{% endblock %}
