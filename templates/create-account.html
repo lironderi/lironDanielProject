@@ -3,201 +3,193 @@
 create account
 {% endblock %}
 {% block intro %}
-WELCOME !
 {% endblock %}
 {% block content %}
 <html>
-
+<!-- 
 <head>
     <meta charset="utf-8">
     <title>Form</title>
     <link href="css/style.css" type="text/css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-</head>
+</head> -->
 
 <body>
     <style>
+        $font-family: "Roboto";
+        $font-size: 14px;
+
+        $color-primary: #ABA194;
+
         * {
-            padding: 0;
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            background: url(http://wrbbradio.org/wp-content/uploads/2016/10/grey-background-07.jpg) no-repeat center fixed;
-            background-size: cover;
-            
+            font-family: $font-family;
+            font-size: $font-size;
+            background-size: 200% 100% !important;
+            animation: move 10s ease infinite;
+            transform: translate3d(0, 0, 0);
+            background: linear-gradient(45deg, #49D49D 10%, #A2C7E5 90%);
+            height: 100vh
         }
 
-        .container {
-            background: #2d3e3f;
-            width: 350px;
-            height: 400px;
-            padding-bottom: 20px;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            margin: auto;
-            padding: 70px 50px 20px 50px;
+        .user {
+            width: 90%;
+            max-width: 340px;
+            margin: 10vh auto;
         }
 
-
-        .fl {
-            float: left;
-            width: 110px;
-            line-height: 35px;
-        }
-
-        .fontLabel {
-            color: white;
-        }
-
-        .fr {
-            float: right;
-        }
-
-        .clr {
-            clear: both;
-        }
-
-        .box {
-            width: 360px;
-            height: 35px;
-            margin-top: 10px;
-            font-family: verdana;
-            font-size: 12px;
-        }
-
-        .textBox {
-            height: 35px;
-            width: 190px;
-            border: none;
-            padding-left: 20px;
-        }
-
-        .new {
-            float: left;
-        }
-
-        .iconBox {
-            height: 35px;
-            width: 40px;
-            line-height: 38px;
+        .user__header {
             text-align: center;
-            background: #ff6600;
+            opacity: 0;
+            transform: translate3d(0, 500px, 0);
+            animation: arrive 500ms ease-in-out 0.7s forwards;
         }
 
-        .radio {
-            color: white;
-            background: #2d3e3f;
-            line-height: 38px;
-        }
-
-        .terms {
-            line-height: 35px;
-            text-align: center;
-            background: #2d3e3f;
+        .user__title {
+            font-size: $font-size;
+            margin-bottom: -10px;
+            font-weight: 500;
             color: white;
         }
 
-        .submit {
-            float: right;
-            border: none;
-            color: white;
-            width: 110px;
-            height: 35px;
-            background: #ff6600;
-            text-transform: uppercase;
-            cursor: pointer;
+        .form {
+            margin-top: 40px;
+            border-radius: 6px;
+            overflow: hidden;
+            opacity: 0;
+            transform: translate3d(0, 500px, 0);
+            animation: arrive 500ms ease-in-out 0.9s forwards;
         }
 
-        ::-webkit-input-placeholder {
-            /* Chrome/Opera/Safari */
+        .form--no {
+            animation: NO 1s ease-in-out;
+            opacity: 1;
+            transform: translate3d(0, 0, 0);
+        }
 
+        .form__input {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            font-family: $font-family;
+            -webkit-appearance: none;
+            border: 0;
+            outline: 0;
+            transition: 0.3s;
+
+            &:focus {
+                background: darken(#fff, 3%);
+            }
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            font-family: $font-family;
+            -webkit-appearance: none;
+            outline: 0;
+            border: 0;
+            color: white;
+            background: $color-primary;
+            transition: 0.3s;
+
+            &:hover {
+                background: darken($color-primary, 5%);
+            }
+        }
+
+        @keyframes NO {
+
+            from,
+            to {
+                -webkit-transform: translate3d(0, 0, 0);
+                transform: translate3d(0, 0, 0);
+            }
+
+            10%,
+            30%,
+            50%,
+            70%,
+            90% {
+                -webkit-transform: translate3d(-10px, 0, 0);
+                transform: translate3d(-10px, 0, 0);
+            }
+
+            20%,
+            40%,
+            60%,
+            80% {
+                -webkit-transform: translate3d(10px, 0, 0);
+                transform: translate3d(10px, 0, 0);
+            }
+        }
+
+        @keyframes arrive {
+            0% {
+                opacity: 0;
+                transform: translate3d(0, 50px, 0);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
+            }
+        }
+
+        @keyframes move {
+            0% {
+                background-position: 0 0
+            }
+
+            50% {
+                background-position: 100% 0
+            }
+
+            100% {
+                background-position: 0 0
+            }
         }
     </style>
     <!-- Body of Form starts -->
-    <div class="container">
-        <form method="post" autocomplete="on">
-            <!--First name-->
-            <div class="box">
-                <label for="firstName" class="fl fontLabel"> First Name: </label>
-                <div class="new iconBox">
-                    <i class="fa fa-user" aria-hidden="true"></i>
-                </div>
-                <div class="fr">
-                    <input type="text" name="firstName" placeholder="First Name" class="textBox" autofocus="on"
-                        required>
-                </div>
-                <div class="clr"></div>
+    <div class="user">
+        <header class="user__header">
+            <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3219/logo.svg" alt="" />
+            <h1 class="user__title">Welcome To ShoppingList</h1>
+        </header>
+
+        <form class="form">
+            <div class="form__group">
+                <input type="text" placeholder="Username" class="form__input" />
             </div>
-            <!--First name-->
 
-
-            <!--Second name-->
-            <div class="box">
-                <label for="secondName" class="fl fontLabel"> Seconed Name: </label>
-                <div class="fl iconBox"><i class="fa fa-user" aria-hidden="true"></i></div>
-                <div class="fr">
-                    <input type="text" required name="secondName" placeholder="Last Name" class="textBox">
-                </div>
-                <div class="clr"></div>
+            <div class="form__group">
+                <input type="email" placeholder="Email" class="form__input" />
             </div>
-            <!--Second name-->
 
-
-            <!---Phone No.------>
-            <div class="box">
-                <label for="phone" class="fl fontLabel"> Phone No.: </label>
-                <div class="fl iconBox"><i class="fa fa-phone-square" aria-hidden="true"></i></div>
-                <div class="fr">
-                    <input type="text" required name="phoneNo" maxlength="10" placeholder="Phone No." class="textBox">
-                </div>
-                <div class="clr"></div>
+            <div class="form__group">
+                <input type="password" placeholder="Password" class="form__input" />
             </div>
-            <!---Phone No.---->
 
-
-            <!---Email ID---->
-            <div class="box">
-                <label for="email" class="fl fontLabel"> Email ID: </label>
-                <div class="fl iconBox"><i class="fa fa-envelope" aria-hidden="true"></i></div>
-                <div class="fr">
-                    <input type="email" required name="email" placeholder="Email Id" class="textBox">
-                </div>
-                <div class="clr"></div>
-            </div>
-            <!--Email ID----->
-
-
-            <!---Password------>
-            <div class="box">
-                <label for="password" class="fl fontLabel"> Password </label>
-                <div class="fl iconBox"><i class="fa fa-key" aria-hidden="true"></i></div>
-                <div class="fr">
-                    <input type="Password" required name="password" placeholder="Password" class="textBox">
-                </div>
-                <div class="clr"></div>
-            </div>
-            <!---Password---->
-
-
-            <!--Terms and Conditions------>
-            <div class="box terms">
-                <input type="checkbox" name="Terms" required> &nbsp; I accept the terms and conditions
-            </div>
-            <!--Terms and Conditions------>
-
-
-
-            <!---Submit Button------>
-            <div class="box" style="background: #2d3e3f">
-                <input type="Submit" name="Submit" class="submit" value="SUBMIT">
-            </div>
-            <!---Submit Button----->
+            <button class="btn" type="button">Register</button>
         </form>
+        <hr>
+       
     </div>
     <!--Body of Form ends--->
+    <script>
+        const button = document.querySelector('.btn');
+        const form = document.querySelector('.form');
+
+        button.addEventListener('click', function () {
+            form.classList.add('form--no');
+        });
+    </script>
 </body>
 
 </html>
