@@ -163,23 +163,23 @@ create account
             <h1 class="user__title">Welcome To ShoppingList</h1>
         </header>
 
-        <form class="form">
+        <form class="form" action="/register" method="post">
             <div class="form__group">
-                <input type="text" placeholder="Username" class="form__input" />
+                <input type="text" name="username" placeholder="Username" class="form__input" required />
             </div>
 
             <div class="form__group">
-                <input type="email" placeholder="Email" class="form__input" />
+                <input type="email" name="email" placeholder="Email" class="form__input" required />
             </div>
 
             <div class="form__group">
-                <input type="password" placeholder="Password" class="form__input" />
+                <input type="password" name="password" placeholder="Password" class="form__input" required />
             </div>
 
-            <button class="btn" type="button">Register</button>
+            <button class="btn" type="submit">Register</button>
         </form>
         <hr>
-       
+
     </div>
     <!--Body of Form ends--->
     <script>
