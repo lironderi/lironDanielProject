@@ -9,7 +9,6 @@ app.secret_key = 'fakekey'
 
 try:
     client = MongoClient('mongodb://localhost:27017/')  
-
     db = client['Website_db']
     print("mongo connect")
 except Exception:
@@ -23,10 +22,12 @@ def home_page():
 @app.route('/first-list', methods=['GET','POST'])
 def first_list_page():
     if request.method == 'POST':
-        item = request.form.get('data-row', placeholder=item)
-        quantity = request.form.get('data-row', placeholde=quantity)
-        db.items.insert_one({"item": item, "quantity": quantity})
+        item = request.form.get('item')
+        quantity = request.form.get('quantity')
+        if item and quantity:
+            db.items.insert_one({"item": item, "quantity": quantity})
     return render_template('first-list.html')
+
 
 
 @app.route('/list', methods=('GET', 'POST'))
@@ -52,10 +53,13 @@ def register():
     # Hash the password for security
     password = hashlib.sha256(request.form.get('password').encode()).hexdigest()
 
-    # Insert into MongoDB
-    db.users.insert_one({"username": username, "email": email, "password": password})
+    try:
+        db.users.insert_one({"username": username, "email": email, "password": password})
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return "An error occurred", 400
 
-    return redirect(url_for('home_page'))
+    return redirect(url_for('login_page'))
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -70,8 +74,6 @@ def login():
         session['username'] = username  # Add the username to the session
         return redirect(url_for('first_list_page'))
     else:
-        # User not found or password did not match
-        # Redirect back to login page or show an error
         return "Invalid username or password", 401
 
 @app.route('/logout')
@@ -80,5 +82,5 @@ def logout():
     return redirect(url_for('home_page'))
 
 
-if __name__ == '__main___':
+if __name__ == '__main__':
   app.run(debug=True, host="0.0.0.0")
