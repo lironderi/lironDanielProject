@@ -52,6 +52,7 @@ List page
         });
       });
     });
+    
     </script>
    <div class="container">
     <table class="table table-bordered table-dark">
@@ -69,13 +70,6 @@ List page
           <td><input class="data-input" type="text"></td>
           <td><div class="mark-square"></div></td>
         </tr>
-        {% for item in items %}
-        <tr data-toggle="stripe">
-          <td>{{ item.id }}</td>
-          <td>{{ item.type }}</td>
-          <td><div class="mark-square"></div></td>
-        </tr>
-        {% endfor %}
       </tbody>
     </table>
    <style>
@@ -95,6 +89,7 @@ List page
 
     .marked {
       background-color: #343a40;
+    }
    </style>
    </div>
 {% endblock %}

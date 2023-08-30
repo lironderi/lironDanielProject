@@ -21,29 +21,49 @@ def home_page():
 
 @app.route('/first-list', methods=['GET','POST'])
 def first_list_page():
+    user = session.get('user')
+    if not user:
+        return redirect(url_for('register'))
+    item = request.form.get('item')
+    quantity = request.form.get('quantity')
     if request.method == 'POST':
-        item = request.form.get('item')
-        quantity = request.form.get('quantity')
+        # ...
         if item and quantity:
-            db.items.insert_one({"item": item, "quantity": quantity})
-    return render_template('first-list.html')
+            user_items_collection = db[user['_id']]  # Use the user's username as collection name
+            user_items_collection.insert_one({"item": item, "quantity": quantity})
+
+    user_items_collection = db[user['username']]  # Use the user's username as collection name
+    items = user_items_collection.find()
+
+    return render_template('first-list.html', user=user, items=items)
 
 
+@app.route('/save-items', methods=['POST'])
+def save_items():
+    user = session.get('user')
+    if not user:
+        return "User not in session", 401
 
-@app.route('/list', methods=('GET', 'POST'))
-def list_page():
-    items = [
-       
-    ]
-    return render_template('list.html', items=items)
+    data = request.json
+    items = data.get('items')
+
+    if items:
+        user_items_collection = db[user['_id']]  # Use the user's username as collection name
+        user_items_collection.insert_many(items)
+        return redirect(url_for('new_list'))
+    else:
+        return {"message": "No items provided"}, 400
+
+
+@app.route('/new_list', methods=('GET', 'POST'))
+def new_list_page():
+    return render_template('new_list.html')
 
 @app.route('/create-accont')
 def create_account():
     return render_template('create-account.html')
 
-@app.route('/login_page')
-def login_page():
-    return render_template('login.html')
+
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -58,8 +78,19 @@ def register():
     except Exception as e:
         print(f"An error occurred: {e}")
         return "An error occurred", 400
+    
+    user = db.users.find_one({"username": username, "password": password})
+    if user:
+        user['_id'] = str(user['_id'])
+        session['user'] = user # Add the username to the session
+        return redirect(url_for('first_list_page'))
+    else:
+        return "Invalid username or password", 401
+    # return redirect(url_for('login_page'))
 
-    return redirect(url_for('login_page'))
+@app.route('/login_page')
+def login_page():
+    return render_template('login.html')
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -72,7 +103,7 @@ def login():
 
     if user:
         session['username'] = username  # Add the username to the session
-        return redirect(url_for('first_list_page'))
+        return redirect(url_for('new_list_page'))
     else:
         return "Invalid username or password", 401
 
