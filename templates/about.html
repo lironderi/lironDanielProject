@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}
+About Us
+{% endblock %}
+{% block body_class %}no-gradient{% endblock %}
+{% block content %}
+<style>
+
+
+    .split-screen {
+        display: flex;
+        height: 100vh;
+        width: 100%;
+    }
+
+    .half {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .black-half {
+        background-color: black;
+        color: white;
+    }
+
+    .grey-half {
+        background-color: grey;
+        color: white;
+    }
+
+    p.title {
+        font-family: 'Courier New', Courier, monospace; /* Change this to the font you prefer */
+        font-size: 2em;
+        margin-top: 20px;
+    }
+
+    p.details {
+        font-size: 1.2em;
+        margin-top: 100px;  /* Increase this to push the details lower */
+    }
+</style>
+
+<div class="split-screen">
+    <div class="half black-half">
+        <!-- Content for the black half can go here -->
+        <p class="title">Liron Deri</p>
+        <p class="details">Role: Developer</p>
+        <p class="details">Email: liron.deri3@outlook.com</p>
+    </div>
+    <div class="half grey-half">
+        <!-- Content for the grey half can go here -->
+        <p class="title">Daniel Sagie</p>
+        <p class="details">Role: Designer</p>
+        <p class="details">Email: danielsagie688@gmail.com</p>
+    </div>
+</div>
+{% endblock %}
