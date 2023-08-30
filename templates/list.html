@@ -56,20 +56,26 @@ List page
    <div class="container">
     <table class="table table-bordered table-dark">
       <thead>
-       <tr>
-        <th>ITEM NUMBER</th>
-         <th>TYPE</th>
-         <th>MARK</th>
-       </tr>
+        <tr>
+          <th>ITEM NUMBER</th>
+          <th>TYPE</th>
+          <th>MARK</th>
+        </tr>
       </thead>
       <tbody>
-      {% for item in items %}
+        <!-- Adding a new row with a mark-square at the beginning -->
+        <tr>
+          <td><input class="data-input" type="text"></td>
+          <td><input class="data-input" type="text"></td>
+          <td><div class="mark-square"></div></td>
+        </tr>
+        {% for item in items %}
         <tr data-toggle="stripe">
           <td>{{ item.id }}</td>
           <td>{{ item.type }}</td>
           <td><div class="mark-square"></div></td>
         </tr>
-      {% endfor %}
+        {% endfor %}
       </tbody>
     </table>
    <style>
