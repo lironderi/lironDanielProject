@@ -1,11 +1,12 @@
 from flask import Flask, render_template, request, url_for, redirect, session
 from pymongo import MongoClient
+import os
 import hashlib  # for password hashing
 from bson import json_util
 from bson import ObjectId
 app = Flask(__name__)
 
-app.secret_key = 'fakekey'
+app.secret_key = os.urandom(24)
 
 #create DB
 try:
@@ -20,6 +21,8 @@ except Exception:
 @app.route('/home', methods=('GET', 'POST'))
 def home_page():
     return render_template('index.html')
+
+
 # about page
 @app.route('/about_page')
 def about_page():
@@ -70,7 +73,7 @@ def new_list_page():
     if user:
         user_items_collection = db[user['_id']]  # Use the user's id as collection name
         items = user_items_collection.find()  # Retrieve all items from the collection
-        return render_template('new_list.html', items=items)
+        return render_template('new_list.html', user=user, items=items)
     else:
         return redirect(url_for('login_page'))
    
@@ -119,7 +122,6 @@ def login():
 
     
     user = db.users.find_one({"username": username, "password": password})
-
     if user:
         user['_id'] = str(user['_id'])  # Convert ObjectId to string
         session['login_user'] = user  # Store the entire user document in the session
@@ -131,11 +133,16 @@ def login():
 @app.route('/temp_col', methods=['POST'])
 def temp_col():
     user = session.get('login_user')
+    data = request.json
     if user:
-        temp_collection_name = f"temp{db[user['_id']]}"  # Use the _id from the user document
-        temp_collection = db[temp_collection_name]
+        temp_collection_name = f"temp_{user['username']}"  # Use the string ID to create collection name
 
-        data = request.json
+        print(temp_collection_name)
+        if not temp_collection_name in db.list_collection_names():
+            temp_collection = db.create_collection(temp_collection_name)
+        else:
+            temp_collection = db[temp_collection_name]
+
         items = data.get('items')
 
         if items:
@@ -152,7 +159,7 @@ def temp_col():
 def logout():
     user = session.get('login_user')
     if user:
-        temp_collection_name = f"temp{db[user['_id']]}"
+        temp_collection_name = f"temp_{user['username']}"
         db.drop_collection(temp_collection_name)  # Delete the temporary collection
     session.pop('login_user', None)
     return redirect(url_for('home_page'))
