@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+  
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -70,13 +71,21 @@
 
 </body>
 <style>
+    @keyframes move {
+    0% {
+      background-position: 0% 50%;
+    }
+    100% {
+      background-position: 100% 50%;
+    }
+  }
   body {
     font-family: $font-family;
     font-size: $font-size;
     background-size: 200% 100% !important;
-    animation: move 10s ease infinite;
+    animation: move 1s linear forwards;
     transform: translate3d(0, 0, 0);
-    background: linear-gradient(45deg, #49D49D 10%, #A2C7E5 90%);
+    background: linear-gradient(45deg, black, #519EB2);
     height: 100vh
   }
 </style>

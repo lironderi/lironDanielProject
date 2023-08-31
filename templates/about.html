@@ -5,12 +5,31 @@ About Us
 {% block body_class %}no-gradient{% endblock %}
 {% block content %}
 <style>
+    @keyframes gradientChange {
+        0% {
+            background-position: 0% 50%;
+        }
+        100% {
+            background-position: 100% 50%;
+        }
+    }
 
+    @keyframes arrive {
+        0% {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 
     .split-screen {
         display: flex;
         height: 100vh;
         width: 100%;
+        border-radius: 10%;
     }
 
     .half {
@@ -19,42 +38,75 @@ About Us
         flex-direction: column;
         align-items: center;
         justify-content: flex-start;
+        background-size: 200% 200%;
+        animation: gradientChange 5s ease infinite;
+        overflow: hidden;
     }
 
     .black-half {
-        background-color: black;
+        background: linear-gradient(45deg, black, #397A91);
         color: white;
     }
 
     .grey-half {
-        background-color: grey;
+        background: linear-gradient(45deg,  #397A91, rgb(203, 195, 207));
         color: white;
     }
 
+    p.title, p.details, .profile-image {
+        opacity: 0;
+        animation: arrive 1s ease-in-out 0.5s forwards;
+    }
+
     p.title {
-        font-family: 'Courier New', Courier, monospace; /* Change this to the font you prefer */
+        font-family: 'Courier New', Courier, monospace;
         font-size: 2em;
         margin-top: 20px;
     }
 
     p.details {
         font-size: 1.2em;
-        margin-top: 100px;  /* Increase this to push the details lower */
+        margin-top: 20px;
+        animation-delay: 1s;  /* Delay the animation */
     }
+
+    .profile-image {
+        border-radius: 50%;
+        width: 150px;
+        height: 150px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        animation-delay: 0.7s;  /* Delay the animation */
+    }
+    .details a {
+    color: white;  /* Sets the text color to white */
+    text-decoration: none;  /* Removes underline */
+    }
+
+    .details a:hover {
+        text-decoration: underline;  /* Adds underline on hover */
+    }
+
 </style>
 
 <div class="split-screen">
     <div class="half black-half">
-        <!-- Content for the black half can go here -->
         <p class="title">Liron Deri</p>
+        <img src="{{ url_for('static', filename='liron.jpg') }}" alt="Liron Deri" class="profile-image">
         <p class="details">Role: Developer</p>
-        <p class="details">Email: liron.deri3@outlook.com</p>
+        <p class="details"> <a href="mailto:liron.deri3@outlook.com">liron.deri3@outlook.com</a></p>
+        <p class="details"> <a href="https://linkedin.com/in/liron-deri-42874427a" target="_blank">Linkedin</a></p>
+        <p class="details"> <a href="https://github.com/lironderi" target="_blank">Github</a></p>
+
     </div>
     <div class="half grey-half">
-        <!-- Content for the grey half can go here -->
         <p class="title">Daniel Sagie</p>
+        <img src="{{ url_for('static', filename='daniel.jpg') }}" alt="Daniel Sagie" class="profile-image">
         <p class="details">Role: Designer</p>
-        <p class="details">Email: danielsagie688@gmail.com</p>
+        <p class="details"> <a href="mailto:danielsagie688@gmail.com">danielsagie688@gmail.com</a></p>
+        <p class="details"><a href="https://linkedin.com/in/daniel-sagie" target="_blank">Linkedin</a></p>
+        <p class="details"> <a href="https://github.com/danielsagie" target="_blank">Github</a></p>
     </div>
 </div>
+
 {% endblock %}

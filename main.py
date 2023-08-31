@@ -80,7 +80,7 @@ def create_account():
     return render_template('create-account.html')
 
 
-# registeration function
+# registeration function!
 @app.route('/register', methods=['POST'])
 def register():
     username = request.form.get('username')
@@ -89,21 +89,24 @@ def register():
     # Hash the password for security
     password = hashlib.sha256(request.form.get('password').encode()).hexdigest()
 
+    existing_user = db.users.find_one({"username": username})
+    if existing_user:
+        return render_template('create-account.html', message='Username already exists.')
+    # Insert new user into database
     try:
         db.users.insert_one({"username": username, "email": email, "password": password})
     except Exception as e:
         print(f"An error occurred: {e}")
         return "An error occurred", 400
     
+    # Validate inserted data
     user = db.users.find_one({"username": username, "password": password})
     if user:
         user['_id'] = str(user['_id'])
-        session['user'] = user # Add the username to the session
+        session['user'] = user  # Add the username to the session
         return redirect(url_for('first_list_page'))
-    else:
-        return "Invalid username or password", 401
-    # return redirect(url_for('login_page'))
 
+    return "Invalid username or password", 401
 
 # login page
 @app.route('/login_page')
@@ -128,24 +131,6 @@ def login():
         return "Invalid username or password", 401
     
 # create temporary collection
-@app.route('/temp_col', methods=['POST'])
-def temp_col():
-    user = session.get('login_user')
-    if user:
-        temp_collection_name = f"temp{db[user['_id']]}"  # Use the _id from the user document
-        temp_collection = db[temp_collection_name]
-
-        data = request.json
-        items = data.get('items')
-
-        if items:
-            documents = [{"item": item["item"], "quantity": item["quantity"]} for item in items]
-            temp_collection.insert_many(documents)
-            return {"message": "Items added to temporary collection"}
-        else:
-            return {"message": "No items provided"}, 400
-    else:
-        return redirect(url_for('login_page'))
 
 # function that taking the user out of the session
 @app.route('/logout')
@@ -157,6 +142,30 @@ def logout():
     session.pop('login_user', None)
     return redirect(url_for('home_page'))
 
+
+@app.route('/temp_col', methods=['POST'])
+def temp_col():
+    user = session.get('login_user')
+    data = request.json
+    if user:
+        temp_collection_name = f"temp_{user['username']}"  # Use the string ID to create collection name
+
+        print(temp_collection_name)
+        if not temp_collection_name in db.list_collection_names():
+            temp_collection = db.create_collection(temp_collection_name)
+        else:
+            temp_collection = db[temp_collection_name]
+
+        items = data.get('items')
+
+        if items:
+            documents = [{"item": item["item"], "quantity": item["quantity"]} for item in items]
+            temp_collection.insert_many(documents)
+            return {"message": "Items added to temporary collection"}
+        else:
+            return {"message": "No items provided"}, 400
+    else:
+        return redirect(url_for('login_page'))
 
 if __name__ == '__main__':
   app.run(debug=True, host="0.0.0.0")
