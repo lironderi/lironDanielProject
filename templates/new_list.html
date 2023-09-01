@@ -23,7 +23,6 @@ List page
     cursor: pointer;
     background-color: rgb(255, 255, 255);
     border-radius: 4px;
-    /* This line rounds the corners */
   }
 
   .marked td {
@@ -37,57 +36,70 @@ List page
     left: 0;
     width: 100%;
     height: 2px;
-    background-color: #343a40;
+    background-color:  #343a40;
     transform: translateY(-50%);
   }
 </style>
+
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    const squares = document.querySelectorAll(".mark-square");
+    const tableBody = document.querySelector(".table tbody");
 
-    squares.forEach(square => {
-      square.addEventListener("click", function () {
-        const row = this.closest("tr");
+    tableBody.addEventListener("click", function (event) {
+      if (event.target.classList.contains("mark-square")) {
+        const row = event.target.closest("tr");
         row.classList.toggle("marked");
-      });
+      }
+    });
+
+    const container = document.querySelector(".container");
+
+    container.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" && event.target.classList.contains("data-input")) {
+        event.preventDefault();
+        const newRow = document.createElement("tr");
+        newRow.innerHTML = `
+          <td><input class="data-input" type="text"></td>
+          <td><input class="data-input" type="text"></td>
+          <td><div class="mark-square"></div></td>
+        `;
+        tableBody.appendChild(newRow);
+        newRow.querySelector(".data-input").focus();
+      }
     });
   });
-
 </script>
+
 <div class="container">
-  <form action="/new_list" method="post">
-    <table class="table table-bordered table-dark">
-      <thead>
-        <tr>
-          <th>Item</th>
-          <th>Quantity</th>
-          <th>MARK</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in items %}
-        <tr>
-          <td>{{ item.item }}</td>
-          <td>{{ item.quantity }}</td>
-          <td>
-            <div class="mark-square"></div>
-          </td>
-        </tr>
-        {% endfor %}
-        <!-- Adding a new row with a mark-square at the beginning -->
-        <tr>
-          <td><input class="data-input" type="text" name="item"></td>
-          <td><input class="data-input" type="text" name="quantity"></td>
-          <td>
-            <div class="mark-square"></div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <button class="add-row-button">Add Row</button>
-    <button type="submit" class="finish-button">Finish</button>
-  </form>
+  <table class="table table-bordered table-dark">
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>Quantity</th>
+        <th>MARK</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td>{{ item.item }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>
+          <div class="mark-square"></div>
+        </td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <td><input class="data-input" type="text" name="item"></td>
+        <td><input class="data-input" type="text" name="quantity"></td>
+        <td>
+          <div class="mark-square"></div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
+
 <style>
   body {
     background-color: #212121;
@@ -108,71 +120,5 @@ List page
     background-color: #343a40;
   }
 </style>
-
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const container = document.querySelector(".container");
-    const addRowButton = document.querySelector(".add-row-button");
-    const finishButton = document.querySelector(".finish-button");
-    const tableBody = container.querySelector("tbody");
-
-    addRowButton.addEventListener("click", function (event) {
-      event.preventDefault();
-      const newRow = createEmptyRow();
-      tableBody.appendChild(newRow);
-    });
-
-    function createEmptyRow() {
-      const newRow = document.createElement("tr");
-      newRow.innerHTML = `
-                <td><input class="data-input" type="text" name="item"></td>
-                <td><input class="data-input" type="text" name="quantity"></td>
-                <td><div class="mark-square"></div></td>
-            `;
-      return newRow;
-    }
-
-    finishButton.addEventListener("click", function () {
-      const user = "{{ user.username }}";  // Get the username from the template context
-      const dataRows = document.querySelectorAll("tbody tr"); // Select all rows within tbody
-      const formData = [];
-
-      
-      dataRows.forEach((row, index) => {
-        console.log(`Processing row ${index + 1}`);
-        const itemInput = row.querySelector("input[name='item']");
-        const quantityInput = row.querySelector("input[name='quantity']");
-
-        if (itemInput && quantityInput) {
-          const item = itemInput.value;
-          const quantity = quantityInput.value;
-
-          if (item && quantity) {
-            formData.push({ item, quantity });
-          }
-        }
-      });
-
-      fetch("/temp_col", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          user: user,
-          items: formData // Use the formData array collected from the rows
-        })
-      })
-        .then(response => response.json())
-        .then(data => {
-          console.log(data);  // Handle the response from the server if needed
-        })
-        .catch(error => {
-          console.error("Error:", error);
-        });
-    });
-
-  });
-</script>
 
 {% endblock %}

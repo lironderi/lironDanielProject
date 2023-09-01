@@ -1,12 +1,11 @@
 from flask import Flask, render_template, request, url_for, redirect, session
 from pymongo import MongoClient
-import os
 import hashlib  # for password hashing
 from bson import json_util
 from bson import ObjectId
 app = Flask(__name__)
 
-app.secret_key = os.urandom(24)
+app.secret_key = 'fakekey'
 
 #create DB
 try:
@@ -21,8 +20,6 @@ except Exception:
 @app.route('/home', methods=('GET', 'POST'))
 def home_page():
     return render_template('index.html')
-
-
 # about page
 @app.route('/about_page')
 def about_page():
@@ -73,7 +70,7 @@ def new_list_page():
     if user:
         user_items_collection = db[user['_id']]  # Use the user's id as collection name
         items = user_items_collection.find()  # Retrieve all items from the collection
-        return render_template('new_list.html', user=user, items=items)
+        return render_template('new_list.html', items=items)
     else:
         return redirect(url_for('login_page'))
    
@@ -83,7 +80,7 @@ def create_account():
     return render_template('create-account.html')
 
 
-# registeration function
+# registeration function!
 @app.route('/register', methods=['POST'])
 def register():
     username = request.form.get('username')
@@ -92,21 +89,24 @@ def register():
     # Hash the password for security
     password = hashlib.sha256(request.form.get('password').encode()).hexdigest()
 
+    existing_user = db.users.find_one({"username": username})
+    if existing_user:
+        return render_template('create-account.html', message='Username already exists.')
+    # Insert new user into database
     try:
         db.users.insert_one({"username": username, "email": email, "password": password})
     except Exception as e:
         print(f"An error occurred: {e}")
         return "An error occurred", 400
     
+    # Validate inserted data
     user = db.users.find_one({"username": username, "password": password})
     if user:
         user['_id'] = str(user['_id'])
-        session['user'] = user # Add the username to the session
+        session['user'] = user  # Add the username to the session
         return redirect(url_for('first_list_page'))
-    else:
-        return "Invalid username or password", 401
-    # return redirect(url_for('login_page'))
 
+    return "Invalid username or password", 401
 
 # login page
 @app.route('/login_page')
@@ -122,6 +122,7 @@ def login():
 
     
     user = db.users.find_one({"username": username, "password": password})
+
     if user:
         user['_id'] = str(user['_id'])  # Convert ObjectId to string
         session['login_user'] = user  # Store the entire user document in the session
@@ -130,6 +131,18 @@ def login():
         return "Invalid username or password", 401
     
 # create temporary collection
+
+# function that taking the user out of the session
+@app.route('/logout')
+def logout():
+    user = session.get('login_user')
+    if user:
+        temp_collection_name = f"temp{db[user['_id']]}"
+        db.drop_collection(temp_collection_name)  # Delete the temporary collection
+    session.pop('login_user', None)
+    return redirect(url_for('home_page'))
+
+
 @app.route('/temp_col', methods=['POST'])
 def temp_col():
     user = session.get('login_user')
@@ -153,17 +166,6 @@ def temp_col():
             return {"message": "No items provided"}, 400
     else:
         return redirect(url_for('login_page'))
-
-# function that taking the user out of the session
-@app.route('/logout')
-def logout():
-    user = session.get('login_user')
-    if user:
-        temp_collection_name = f"temp_{user['username']}"
-        db.drop_collection(temp_collection_name)  # Delete the temporary collection
-    session.pop('login_user', None)
-    return redirect(url_for('home_page'))
-
 
 if __name__ == '__main__':
   app.run(debug=True, host="0.0.0.0")

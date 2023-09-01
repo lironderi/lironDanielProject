@@ -38,20 +38,35 @@
         </li>
       </ul>
     </div>
+    <div class="background-image"></div>
   </nav>
+  <!-- <img src="{{ url_for('static', filename='image.png') }}" alt="Description of image"> -->
   
 </body>
 <style>
   /*  */
+    /* .background-image {
+      background-image: url('image.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      height: 100vh;
+
+    } */
 
   body {
-    font-family: $font-family;
+    /* font-family: $font-family;
     font-size: $font-size;
     background-size: 200% 100% !important;
-    animation: move 10s ease infinite;
-    transform: translate3d(0, 0, 0);
-    background: linear-gradient(45deg, #49D49D 10%, #A2C7E5 90%);
-    height: 100vh
+    /* animation: move 10s ease infinite;
+    transform: translate3d(0, 0, 0); */
+    /* height: 100vh
+    background-image: url('image.png'); */ 
+    background-image: url("{{ url_for('static', filename='image.png') }}"); /* Update 'image.png' with your image name */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    height: 100vh;
   }
 </style>
 
