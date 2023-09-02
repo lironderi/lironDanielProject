@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}
+List page
+{% endblock %}
+{% block content %}
+<style>
+    .container {
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+        height: 100vh;
+    }
+
+    .table td,
+    .table th {
+        border: 1px solid white;
+    }
+
+    .mark-square {
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+        background-color: rgb(255, 255, 255);
+        border-radius: 4px;
+    }
+
+    .marked td {
+        position: relative;
+    }
+
+    .marked td::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background-color: #343a40;
+        transform: translateY(-50%);
+    }
+
+    body {
+        background-color: #212121;
+        color: white;
+    }
+
+    .container {
+        width: 60%;
+        margin-top: 50px;
+    }
+
+    .table td,
+    .table th {
+        border: 1px solid white;
+    }
+
+    .marked {
+        background-color: #343a40;
+    }
+</style>
+<div class="container">
+    <table class="table table-bordered table-dark">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>MARK</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item['item'] }}</td>
+                <td>{{ item['quantity'] }}</td>
+                <td>
+                    <div class="mark-square"></div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

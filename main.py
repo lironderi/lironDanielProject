@@ -58,6 +58,7 @@ def save_items():
     if items:
         user_items_collection = db[user['_id']]  # Use the user's id as collection name
         user_items_collection.insert_many(items)
+        session['login_user'] = user
         return redirect(url_for('new_list'))
     else:
         return {"message": "No items provided"}, 400
@@ -126,22 +127,22 @@ def login():
     if user:
         user['_id'] = str(user['_id'])  # Convert ObjectId to string
         session['login_user'] = user  # Store the entire user document in the session
-        return redirect(url_for('new_list_page'))
+        return redirect(url_for('my_list'))
     else:
         return "Invalid username or password", 401
     
 # create temporary collection
 
-# function that taking the user out of the session
-@app.route('/logout')
-def logout():
+@app.route('/my_list', methods=['GET'])
+def my_list():
     user = session.get('login_user')
     if user:
-        temp_collection_name = f"temp{db[user['_id']]}"
-        db.drop_collection(temp_collection_name)  # Delete the temporary collection
-    session.pop('login_user', None)
-    return redirect(url_for('home_page'))
-
+        user_items_collection = db[user['_id']]  # Use the user's id as collection name
+        items = user_items_collection.find()
+        return render_template('my_list.html', items=items)
+    else:
+        # Handle the case where the user is not logged in or does not exist
+        return redirect('/login')
 
 @app.route('/temp_col', methods=['POST'])
 def temp_col():
@@ -166,6 +167,16 @@ def temp_col():
             return {"message": "No items provided"}, 400
     else:
         return redirect(url_for('login_page'))
+    
+    # function that taking the user out of the session
+@app.route('/logout')
+def logout():
+    user = session.get('login_user')
+    if user:
+        temp_collection_name = f"temp_{user['username']}"    
+        db.drop_collection(temp_collection_name)  # Delete the temporary collection
+    session.pop('login_user', None)
+    return redirect(url_for('home_page'))
 
 if __name__ == '__main__':
   app.run(debug=True, host="0.0.0.0")
