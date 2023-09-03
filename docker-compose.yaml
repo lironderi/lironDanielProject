@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  web:
+    build: 
+      context: .
+    ports:
+      - 5000:5000
+    environment:
+     MONGO_URI: "mongodb://mongo:27017/Website_db"
+    depends_on: 
+      - mongo 
+
+  mongo:
+    image: "mongo:latest"
+    container_name: mongo
+    hostname: mongo
+    logging:
+      driver: none
+    ports:
+      - "27017:27017"
+    # environment:
+    #   MONGO_INITDB_DATABASE: Website_db
+#     volumes:
+#       - mongodb_data:/data/db
+# volumes:
+#   mongodb_data
