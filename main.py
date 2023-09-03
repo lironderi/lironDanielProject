@@ -1,15 +1,16 @@
 from flask import Flask, render_template, request, url_for, redirect, session
 from pymongo import MongoClient
 import hashlib  # for password hashing
-from bson import json_util
-from bson import ObjectId
+import os
+
 app = Flask(__name__)
 
 app.secret_key = 'fakekey'
-
+MONGO_URI=os.environ.get('MONGO_URI')
 #create DB
+print(MONGO_URI)
 try:
-    client = MongoClient('mongodb://localhost:27017/')  
+    client = MongoClient(MONGO_URI)  
     db = client['Website_db']
     print("mongo connect")
 except Exception:
@@ -179,4 +180,5 @@ def logout():
     return redirect(url_for('home_page'))
 
 if __name__ == '__main__':
-  app.run(debug=True, host="0.0.0.0")
+  port = int(os.environ.get('PORT', 5000))
+  app.run(debug=True, host="0.0.0.0", port=port)
