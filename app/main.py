@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, url_for, redirect, session
 from pymongo import MongoClient
 import hashlib  # for password hashing
 import os
-from bson.json_util import dumps
+from bson import ObjectId
 
 app = Flask(__name__)
 app.secret_key = 'fakekey'
@@ -181,6 +181,17 @@ def temp_col():
     else:
         return redirect(url_for('login_page'))
     
+@app.route('/delete_item/<string:rowId>', methods=['DELETE'])
+def delete_item(rowId):
+    user = session['login_user']
+    temp_user = session['temp']
+    if user or temp_user:
+        collection = db[user['_id']]
+        collection.delete_one({'_id':ObjectId(rowId)})
+        return "deleted"
+    else:
+        return "not deleted"
+
 # function that taking the user out of the session
 @app.route('/logout')
 def logout():
