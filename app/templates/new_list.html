@@ -260,14 +260,14 @@ xnugget info
   }
 
   .marked td::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background-color: #343a40;
-    transform: translateY(-50%);
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: #b52626;
+      transform: translateY(-50%);
   }
 
 
@@ -308,7 +308,7 @@ xnugget info
     -o-transform: translateY(-40px);
     transform: translateY(-40px);
     /* Force Hardware Acceleration in WebKit */
-    -webkit-backface-visibility: hidden;
+    /* -webkit-backface-visibility: hidden; */
     -webkit-transition-property: -webkit-transform;
     -moz-transition-property: -moz-transform;
     transition-property: transform;
@@ -441,160 +441,176 @@ xnugget info
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    const tableBody = document.querySelector(".table tbody");
-
-    tableBody.addEventListener("click", function (event) {
-      if (event.target.classList.contains("mark-square")) {
-        const row = event.target.closest("tr");
-        row.classList.toggle("marked");
-      }
+      const tableBody = document.querySelector(".table tbody");
       const yesButton = document.getElementById("yes-button");
-      yesButton.addEventListener("click", function (event) {
-        event.preventDefault();
-
-        // Gather the data from the table and create an array of items
-        const items = [];
-        const tableRows = document.querySelectorAll(".table tbody tr");
-        tableRows.forEach(function (row) {
-          const item = row.querySelector("td:nth-child(1) input").value;
-          const quantity = row.querySelector("td:nth-child(2) input").value;
-          items.push({ "item": item, "quantity": quantity });
-        });
-
-        // Send a POST request to the /save-items endpoint with the data
-        fetch("/save-items", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ items: items }),
-        })
-          .then((response) => {
-            if (response.status === 200) {
-              // Handle a successful response, e.g., show a success message or redirect
-              // You can add your own logic here
-              console.log("Items saved successfully");
-            } else {
-              // Handle an error response, e.g., display an error message
-              // You can add your own error handling here
-              console.error("Error saving items");
-            }
-          })
-          .catch((error) => {
-            // Handle any network or other errors
-            console.error("Error:", error);
-          });
-      });
       const noButton = document.getElementById("no-button");
-      noButton.addEventListener("click", function (event) {
-        event.preventDefault();
+      const container = document.querySelector(".container");
+      const finishButton = document.getElementById("finish-button");
+      
 
-        // Gather the data from the table and create an array of items
-        const items = [];
-        const tableRows = document.querySelectorAll(".table tbody tr");
-        tableRows.forEach(function (row) {
-          const item = row.querySelector("td:nth-child(1) input").value;
-          const quantity = row.querySelector("td:nth-child(2) input").value;
-          items.push({ "item": item, "quantity": quantity });
+      container.addEventListener("click", function (event) {
+        if (event.target.classList.contains("mark-square")) {
+          const row = event.target.closest("tr");
+          row.classList.toggle("marked");
+        }
+      });
+        yesButton.addEventListener("click", function (event) {
+
+          const user = "{{ user.username }}";  // Get the username from the template context
+          const dataRows = document.querySelectorAll(".data-row");
+          const formData = [];
+          dataRows.forEach(row => {
+            const item = row.querySelector("input[name='item']").value;
+            const quantity = row.querySelector("input[name='quantity']").value;
+
+            if (item && quantity) {
+              formData.push({ item, quantity });
+            }
+          });
+
+
+          fetch("/save-items", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ user: user, items: formData }),
+          })
+            .then(response => response.json())
+            .then(data => {
+              console.log(data);  // Handle the response from the server if needed
+            })
+            .catch(error => {
+              console.error("Error:", error);
+            });
         });
 
-        // Send the items to the /temp_col endpoint via AJAX POST request
-        fetch("/temp_col", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ items: items }),
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.message === "Items added to temporary collection") {
-              // Handle a successful response, e.g., show a success message
-              console.log("Items sent to temporary collection");
-              // Close the window or perform any desired action here
-              window.close();
-            } else {
-              // Handle an error response, e.g., display an error message
-              console.error("Error sending items");
-            }
-          })
-          .catch((error) => {
-            // Handle any network or other errors
-            console.error("Error:", error);
+        noButton.addEventListener("click", function (event) {
+          event.preventDefault();
+
+          // Gather the data from the table and create an array of items
+          const items = [];
+          const tableRows = document.querySelectorAll(".table tbody tr");
+          tableRows.forEach(function (row) {
+            const item = row.querySelector("td:nth-child(1) input").value;
+            const quantity = row.querySelector("td:nth-child(2) input").value;
+            items.push({ "item": item, "quantity": quantity });
           });
+
+          // Send the items to the /temp_col endpoint via AJAX POST request
+          fetch("/temp_col", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ items: items }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.message === "Items added to temporary collection") {
+                // Handle a successful response, e.g., show a success message
+                console.log("Items sent to temporary collection");
+                // Close the window or perform any desired action here
+                window.close();
+              } else {
+                // Handle an error response, e.g., display an error message
+                console.error("Error sending items");
+              }
+            })
+            .catch((error) => {
+              // Handle any network or other errors
+              console.error("Error:", error);
+            });
+        });
+      
+
+
+
+      container.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" && event.target.classList.contains("data-input")) {
+          event.preventDefault(); // Prevent the default behavior (form submission)
+          const newRow = createEmptyRow();
+          const currentRow = event.target.closest(".data-row");
+          const nextRow = currentRow.nextElementSibling;
+
+          if (nextRow) {
+            nextRow.before(newRow);
+          } else {
+            currentRow.parentNode.appendChild(newRow);
+          }
+
+          newRow.querySelector(".data-input").focus();
+        }
       });
-    });
 
-    const container = document.querySelector(".container");
 
-    container.addEventListener("keydown", function (event) {
-      if (event.key === "Enter" && event.target.classList.contains("data-input")) {
-        event.preventDefault();
-        const newRow = document.createElement("tr");
-        newRow.innerHTML = `
-          <td><input class="data-input" type="text"></td>
-          <td><input class="data-input" type="text"></td>
-          <td><div class="mark-square"></div></td>
-        `;
-        tableBody.appendChild(newRow);
-        newRow.querySelector(".data-input").focus();
+      finishButton.addEventListener("click", function () {
+        // Show the popup when the "Finish" button is clicked
+        const popup = document.querySelector(".cd-popup");
+        popup.classList.add("is-visible");
+      });
+
+      //close popup
+      $('.cd-popup').on('click', function (event) {
+          if ($(event.target).is('.cd-popup-close') || $(event.target).is('.cd-popup')) {
+            event.preventDefault();
+            $(this).removeClass('is-visible');
+          }
+      });
+      //close popup when clicking the esc keyboard button
+      $(document).keyup(function (event) {
+          if (event.which == '27') {
+            $('.cd-popup').removeClass('is-visible');
+          }
+      });
+
+      function createEmptyRow() {
+          const newRow = document.createElement("tr");
+          newRow.classList.add("data-row");
+          newRow.innerHTML = `
+              <td><input class="data-input" type="text" name="item"></td>
+              <td><input class="data-input" type="text" name="quantity"></td>
+              <td><div class="mark-square"></div></td>
+          `;
+          return newRow;
       }
-    });
-
-    const finishButton = document.getElementById("finish-button");
-    finishButton.addEventListener("click", function () {
-      // Show the popup when the "Finish" button is clicked
-      const popup = document.querySelector(".cd-popup");
-      popup.classList.add("is-visible");
-    });
-
-    //close popup
-    $('.cd-popup').on('click', function (event) {
-      if ($(event.target).is('.cd-popup-close') || $(event.target).is('.cd-popup')) {
-        event.preventDefault();
-        $(this).removeClass('is-visible');
-      }
-    });
-    //close popup when clicking the esc keyboard button
-    $(document).keyup(function (event) {
-      if (event.which == '27') {
-        $('.cd-popup').removeClass('is-visible');
-      }
-    });
 
   });
 
 </script>
 
 <div class="container">
-  <table class="table table-bordered table-dark">
-    <thead>
-      <tr>
-        <th>Item</th>
-        <th>Quantity</th>
-        <th>MARK</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item in items %}
-      <tr>
-        <td>{{ item.item }}</td>
-        <td>{{ item.quantity }}</td>
-        <td>
-          <div class="mark-square"></div>
-        </td>
-      </tr>
-      {% endfor %}
-      <tr>
-        <td><input class="data-input" type="text" name="item"></td>
-        <td><input class="data-input" type="text" name="quantity"></td>
-        <td>
-          <div class="mark-square"></div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-  <button id="finish-button" class="btn btn-primary">Finish</button>
+  <form id="item-form">
+      <table class="table table-bordered table-dark">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Quantity</th>
+            <th>MARK</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+          <tr>
+            <td>{{ item.item }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>
+              <div class="mark-square"></div>
+            </td>
+          </tr>
+          {% endfor %}
+          <tr class="data-row">
+            <td><input class="data-input" type="text" name="item"></td>
+            <td><input class="data-input" type="text" name="quantity"></td>
+            <td>
+              <div class="mark-square"></div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+  </form>
+    <button id="finish-button" class="btn btn-primary">Finish</button>
+  
 </div>
 
 <div class="cd-popup" role="alert">

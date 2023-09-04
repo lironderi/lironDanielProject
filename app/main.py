@@ -1,10 +1,12 @@
 from flask import Flask, render_template, request, url_for, redirect, session
 from pymongo import MongoClient
+import src.database
 import hashlib  # for password hashing
 import os
+from bson.json_util import dumps
 
 app = Flask(__name__)
-
+db=src.database
 app.secret_key = 'fakekey'
 MONGO_URI=os.environ.get('MONGO_URI')
 #create DB
@@ -24,8 +26,7 @@ def home_page():
 # about page
 @app.route('/about_page')
 def about_page():
-    return render_template('about.html')
-
+        return render_template('about.html')
 #first list to create after registeration
 @app.route('/first-list', methods=['GET','POST'])
 def first_list_page():
@@ -39,30 +40,39 @@ def first_list_page():
         if item and quantity:
             user_items_collection = db[user['_id']]  # Use the user's id as collection name
             user_items_collection.insert_one({"item": item, "quantity": quantity})
+            session['login_user'] = user
 
-    user_items_collection = db[user['_id']]  # Use the user's id as collection name
-    items = user_items_collection.find()
-
-    return render_template('first-list.html', user=user, items=items)
+    return render_template('first-list.html', user=user)
 
 
 #insert items to the DB to a collection called by the user id
 @app.route('/save-items', methods=['POST'])
 def save_items():
     user = session.get('user')
-    if not user:
-        return "User not in session", 401
+    login_user = session.get('login_user')
+    if user:
+        data = request.json
+        items = data.get('items')
 
-    data = request.json
-    items = data.get('items')
-
-    if items:
-        user_items_collection = db[user['_id']]  # Use the user's id as collection name
-        user_items_collection.insert_many(items)
-        session['login_user'] = user
-        return redirect(url_for('new_list'))
-    else:
-        return {"message": "No items provided"}, 400
+        if items:
+            user_items_collection = db[user['_id']]  # Use the user's id as collection name
+            user_items_collection.insert_many(items)
+            session['login_user'] = user
+            return redirect(url_for('my_list'))
+        
+    if login_user:
+        data = request.json
+        print(data)
+        current_items = db.db[user['_id']].find()
+        items = data.get('items')
+        print("////////")
+        if items and current_items:
+            user_items_collection = db[user['_id']]  # Use the user's id as collection name
+            user_items_collection.insert_many(current_items, items)
+            session['login_user'] = user
+            return redirect(url_for('my_list'))
+    
+    return "djnd"   
 
 
 # create new list when you already have an account
@@ -72,7 +82,7 @@ def new_list_page():
     if user:
         user_items_collection = db[user['_id']]  # Use the user's id as collection name
         items = user_items_collection.find()  # Retrieve all items from the collection
-        return render_template('new_list.html', items=items)
+        return render_template('new_list.html',user=user, items=items)
     else:
         return redirect(url_for('login_page'))
    
