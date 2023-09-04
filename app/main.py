@@ -189,6 +189,7 @@ def logout():
         temp_collection_name = f"temp_{user['username']}"    
         db.drop_collection(temp_collection_name)  # Delete the temporary collection
     session.pop('login_user', None)
+    session.pop('temp', None)
     return redirect(url_for('home_page'))
 
 if __name__ == '__main__':
