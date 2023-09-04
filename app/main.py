@@ -1,16 +1,12 @@
 from flask import Flask, render_template, request, url_for, redirect, session
 from pymongo import MongoClient
-import src.database
 import hashlib  # for password hashing
 import os
 from bson.json_util import dumps
 
 app = Flask(__name__)
-db=src.database
 app.secret_key = 'fakekey'
 MONGO_URI=os.environ.get('MONGO_URI')
-#create DB
-print(MONGO_URI)
 try:
     client = MongoClient(MONGO_URI)  
     db = client['Website_db']
@@ -62,17 +58,15 @@ def save_items():
         
     if login_user:
         data = request.json
-        print(data)
         current_items = db.db[user['_id']].find()
         items = data.get('items')
-        print("////////")
         if items and current_items:
             user_items_collection = db[user['_id']]  # Use the user's id as collection name
             user_items_collection.insert_many(current_items, items)
             session['login_user'] = user
             return redirect(url_for('my_list'))
     
-    return "djnd"   
+    return "something"   
 
 
 # create new list when you already have an account
@@ -85,7 +79,18 @@ def new_list_page():
         return render_template('new_list.html',user=user, items=items)
     else:
         return redirect(url_for('login_page'))
-   
+
+@app.route('/temp_new_list', methods=('GET', 'POST'))
+def temp_new_list_page():
+    user = session.get('temp')
+    if user:
+        temp_collection_name = f"temp_{user['username']}"
+        items = db[temp_collection_name].find()     
+        return render_template('new_list.html',user=user, items=items)
+    else:
+        return redirect(url_for('login_page'))
+    
+
 # registeration page
 @app.route('/create-accont')
 def create_account():
@@ -158,28 +163,25 @@ def my_list():
 @app.route('/temp_col', methods=['POST'])
 def temp_col():
     user = session.get('login_user')
-    data = request.json
     if user:
         temp_collection_name = f"temp_{user['username']}"  # Use the string ID to create collection name
 
-        print(temp_collection_name)
         if not temp_collection_name in db.list_collection_names():
             temp_collection = db.create_collection(temp_collection_name)
         else:
             temp_collection = db[temp_collection_name]
-
+        data = request.json
         items = data.get('items')
-
         if items:
-            documents = [{"item": item["item"], "quantity": item["quantity"]} for item in items]
-            temp_collection.insert_many(documents)
-            return {"message": "Items added to temporary collection"}
+            temp_collection.insert_many(items)
+            session['temp'] = user
+            return "someting"
         else:
-            return {"message": "No items provided"}, 400
+            return "something"
     else:
         return redirect(url_for('login_page'))
     
-    # function that taking the user out of the session
+# function that taking the user out of the session
 @app.route('/logout')
 def logout():
     user = session.get('login_user')

@@ -486,39 +486,32 @@ xnugget info
         });
 
         noButton.addEventListener("click", function (event) {
-          event.preventDefault();
 
-          // Gather the data from the table and create an array of items
-          const items = [];
-          const tableRows = document.querySelectorAll(".table tbody tr");
-          tableRows.forEach(function (row) {
-            const item = row.querySelector("td:nth-child(1) input").value;
-            const quantity = row.querySelector("td:nth-child(2) input").value;
-            items.push({ "item": item, "quantity": quantity });
+          const user = "{{ user.username }}";  // Get the username from the template context
+          const dataRows = document.querySelectorAll(".data-row");
+          const formData = [];
+          dataRows.forEach(row => {
+            const item = row.querySelector("input[name='item']").value;
+            const quantity = row.querySelector("input[name='quantity']").value;
+
+            if (item && quantity) {
+              formData.push({ item, quantity });
+            }
           });
-
-          // Send the items to the /temp_col endpoint via AJAX POST request
+        
+          
           fetch("/temp_col", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ items: items }),
+            body: JSON.stringify({ user: user, items: formData }),
           })
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.message === "Items added to temporary collection") {
-                // Handle a successful response, e.g., show a success message
-                console.log("Items sent to temporary collection");
-                // Close the window or perform any desired action here
-                window.close();
-              } else {
-                // Handle an error response, e.g., display an error message
-                console.error("Error sending items");
-              }
+            .then(response => response.json())            
+            .then(data => {
+              console.log(data);  // Handle the response from the server if needed
             })
-            .catch((error) => {
-              // Handle any network or other errors
+            .catch(error => {
               console.error("Error:", error);
             });
         });
@@ -618,9 +611,9 @@ xnugget info
     <p>Save items to My List?</p>
     <ul class="cd-buttons">
       <li><a href="{{ url_for('my_list')}}" id="yes-button">Yes</a></li>
-      <li><a href="#" id="no-button">No</a></li>
+      <li><a href="{{ url_for('temp_new_list_page')}}" id="no-button">No</a></li>
     </ul>
-    <a href="#0" class="cd-popup-close img-replace">Close</a>
+    <a href="#0"  class="cd-popup-close img-replace">Close</a>
   </div> <!-- cd-popup-container -->
 </div> <!-- cd-popup -->
 
