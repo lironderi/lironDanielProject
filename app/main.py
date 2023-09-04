@@ -46,6 +46,7 @@ def first_list_page():
 def save_items():
     user = session.get('user')
     login_user = session.get('login_user')
+        
     if user:
         data = request.json
         items = data.get('items')
@@ -72,7 +73,7 @@ def save_items():
 # create new list when you already have an account
 @app.route('/new_list', methods=('GET', 'POST'))
 def new_list_page():
-    user = session.get('login_user')
+    user = session.get( 'login_user')
     if user:
         user_items_collection = db[user['_id']]  # Use the user's id as collection name
         items = user_items_collection.find()  # Retrieve all items from the collection
@@ -80,15 +81,15 @@ def new_list_page():
     else:
         return redirect(url_for('login_page'))
 
-@app.route('/temp_new_list', methods=('GET', 'POST'))
-def temp_new_list_page():
-    user = session.get('temp')
-    if user:
-        temp_collection_name = f"temp_{user['username']}"
-        items = db[temp_collection_name].find()     
-        return render_template('new_list.html',user=user, items=items)
-    else:
-        return redirect(url_for('login_page'))
+# @app.route('/temp_new_list', methods=('GET', 'POST'))
+# def temp_new_list_page():
+#     user = session.get('temp', 'login_user')
+#     if user:
+#         temp_collection_name = f"temp_{user['username']}"
+#         items = db[temp_collection_name].find()     
+#         return render_template('new_list.html',user=user, items=items)
+#     else:
+#         return redirect(url_for('login_page'))
     
 
 # registeration page
@@ -151,7 +152,7 @@ def login():
 
 @app.route('/my_list', methods=['GET'])
 def my_list():
-    user = session.get('login_user')
+    user = session.get( 'login_user')
     if user:
         user_items_collection = db[user['_id']]  # Use the user's id as collection name
         items = user_items_collection.find()
@@ -160,32 +161,11 @@ def my_list():
         # Handle the case where the user is not logged in or does not exist
         return redirect('/login')
 
-@app.route('/temp_col', methods=['POST'])
-def temp_col():
-    user = session.get('login_user')
-    if user:
-        temp_collection_name = f"temp_{user['username']}"  # Use the string ID to create collection name
-
-        if not temp_collection_name in db.list_collection_names():
-            temp_collection = db.create_collection(temp_collection_name)
-        else:
-            temp_collection = db[temp_collection_name]
-        data = request.json
-        items = data.get('items')
-        if items:
-            temp_collection.insert_many(items)
-            session['temp'] = user
-            return "someting"
-        else:
-            return "something"
-    else:
-        return redirect(url_for('login_page'))
     
 @app.route('/delete_item/<string:rowId>', methods=['DELETE'])
 def delete_item(rowId):
-    user = session['login_user']
-    temp_user = session['temp']
-    if user or temp_user:
+    user = session.get('login_user')
+    if user :
         collection = db[user['_id']]
         collection.delete_one({'_id':ObjectId(rowId)})
         return "deleted"
@@ -197,10 +177,7 @@ def delete_item(rowId):
 def logout():
     user = session.get('login_user')
     if user:
-        temp_collection_name = f"temp_{user['username']}"    
-        db.drop_collection(temp_collection_name)  # Delete the temporary collection
-    session.pop('login_user', None)
-    session.pop('temp', None)
+        session.pop('login_user', None)
     return redirect(url_for('home_page'))
 
 if __name__ == '__main__':
