@@ -75,9 +75,3 @@ jobs:
         context: ./app
         push: true
         tags: lironderi/market-app:latest
-    - name: Test
-      run: |
-        curl -X POST https://api.github.com/repos/lironderi/project_conf/dispatches \
-        -H 'Accept: application/vnd.github.everest-preview+json' \
-        -u ${{ secrets.ARGO_KEY }} \
-        --data '{"event_type": "Trigger Workflow", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'" }}'
