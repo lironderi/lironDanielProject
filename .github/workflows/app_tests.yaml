@@ -58,4 +58,4 @@ jobs:
       with:
         context: ./app
         push: true
-        tags: lironderi/market-app:latest
+        tags: ${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_number }}
