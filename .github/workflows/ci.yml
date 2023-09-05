@@ -60,3 +60,12 @@ jobs:
         context: ./app
         push: true
         tags: lironderi/market-app:latest
+
+    - name: Trigger ArgoCD Sync
+      run: |
+        git clone https://github.com/danielsagie/project_conf
+        cd your-k8s-repo
+        echo "Trigger change" >> trigger.txt
+        git add trigger.txt
+        git commit -m "Trigger ArgoCD Sync"
+        git push
