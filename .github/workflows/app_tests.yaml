@@ -1,4 +1,4 @@
-name: app tests
+name: app test
 on:
   push:
   pull_request:
@@ -9,7 +9,8 @@ jobs:
       matrix: 
         os: [ ubuntu-latest ]
         python-version:
-          - "3.9"
+          - "3.7"
+          - "3.8"
     name: TESTS
     runs-on: ${{ matrix.os }}
     
@@ -39,3 +40,23 @@ jobs:
 
     - name: Run Python tests
       run: pytest
+  docker_build_and_push:
+    needs: running_tests  
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: ./app
+        push: true
+        tags: lironderi/market-app:latest
