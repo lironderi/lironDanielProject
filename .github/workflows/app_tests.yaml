@@ -38,6 +38,6 @@ jobs:
     - name: Run Python tests
       run: |
         export FLASK_APP=app/main.py
-        nohup flask run
+        flask run &
         pytest
 #test5
