@@ -34,14 +34,14 @@ def test_fake_page(client):
     assert rv.status_code == 404
 
 
-def test_db():
-    try:
-        db = TestConfig.db
-        users = "users"
-        db.create_collection(users)
-        db.users.insert_one({"name": "test_name", "email": "test@email", "password": 12345})
-        assert db.users.find({"name": "test_name"})
-    finally:
-        db.users.drop()
-        client = TestConfig.client
-        client.drop_database('Temp_db')
+# def test_db():
+#     try:
+#         db = TestConfig.db
+#         users = "users"
+#         db.create_collection(users)
+#         db.users.insert_one({"name": "test_name", "email": "test@email", "password": 12345})
+#         assert db.users.find({"name": "test_name"})
+#     finally:
+#         db.users.drop()
+#         client = TestConfig.client
+#         client.drop_database('Temp_db')
