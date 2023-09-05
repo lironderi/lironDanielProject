@@ -30,11 +30,11 @@ jobs:
         pip install -r app/requirements.txt
         pip install pytest
     
-    - name: run app
-      env: 
-        FLASK_APP: ${{ env.FLASK_APP }}
-      run: |
-        $(export FLASK_APP=main.py && flask run)
+    # - name: run app
+    #   env: 
+    #     FLASK_APP: ${{ env.FLASK_APP }}
+    #   run: |
+    #     $(export FLASK_APP=main.py && flask run)
 
     - name: Run Python tests
       run: pytest
