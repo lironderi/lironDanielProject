@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, url_for, redirect, session
-from pymongo import MongoClient
+from modules.db_config import RunConfig
 import hashlib  # for password hashing
 import os
 from bson import ObjectId
@@ -7,12 +7,7 @@ from bson import ObjectId
 app = Flask(__name__)
 app.secret_key = 'fakekey'
 MONGO_URI=os.environ.get('MONGO_URI')
-try:
-    client = MongoClient(MONGO_URI)  
-    db = client['Website_db']
-    print("mongo connect")
-except Exception:
-    print("enable to connect mongodb")
+db = RunConfig.db
 
 #route to home page
 @app.route('/', methods=('GET', 'POST'))
@@ -81,15 +76,6 @@ def new_list_page():
     else:
         return redirect(url_for('login_page'))
 
-# @app.route('/temp_new_list', methods=('GET', 'POST'))
-# def temp_new_list_page():
-#     user = session.get('temp', 'login_user')
-#     if user:
-#         temp_collection_name = f"temp_{user['username']}"
-#         items = db[temp_collection_name].find()     
-#         return render_template('new_list.html',user=user, items=items)
-#     else:
-#         return redirect(url_for('login_page'))
     
 
 # registeration page
@@ -152,7 +138,7 @@ def login():
 
 @app.route('/my_list', methods=['GET'])
 def my_list():
-    user = session.get( 'login_user')
+    user = session.get('login_user')
     if user:
         user_items_collection = db[user['_id']]  # Use the user's id as collection name
         items = user_items_collection.find()
@@ -180,6 +166,7 @@ def logout():
         session.pop('login_user', None)
     return redirect(url_for('home_page'))
 
-if __name__ == '__main__':
-  port = int(os.environ.get('PORT', 5000))
-  app.run(debug=True, host="0.0.0.0", port=port)
+def create_app(app):
+    if __name__ == '__main__':
+        port = int(os.environ.get('PORT', 5000))
+        app.run(debug=True, host="0.0.0.0", port=port)
