@@ -31,10 +31,8 @@ jobs:
         pip install pytest
     
     - name: run app
-      # env: 
-      #   FLASK_APP: ${{ env.FLASK_APP }}
       run: |
-        echo "$FLASK_APP"
+        export FLASK_APP=app/main.py
         flask run
 
     - name: Run Python tests
