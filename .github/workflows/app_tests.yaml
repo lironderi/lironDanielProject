@@ -33,7 +33,7 @@ jobs:
     - name: run app
       run: |
         export FLASK_APP=app/main.py
-        flask run >> stamfile.txt
+        nohup flask run &
 
     - name: Run Python tests
       run: pytest
