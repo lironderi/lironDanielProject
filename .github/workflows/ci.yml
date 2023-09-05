@@ -59,4 +59,4 @@ jobs:
       with:
         context: ./app
         push: true
-        tags: your_dockerhub_username/your_repository:latest
+        tags: lironderi/market-app:latest
