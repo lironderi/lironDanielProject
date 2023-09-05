@@ -73,4 +73,4 @@ jobs:
         echo "Trigger change" >> trigger.txt
         git add trigger.txt
         git commit -m "Trigger ArgoCD Sync"
-        git push
+        git push https://${{ secrets.GH_PAT }}@github.com/danielsagie/project_conf.git
