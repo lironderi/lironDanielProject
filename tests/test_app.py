@@ -1,9 +1,9 @@
 from app.main import app
-from modules.db_config import TestConfig
+# from modules.db_config import TestConfig
 import pytest 
+# from pymongo import MongoClient
 
 @pytest.fixture
-
 def client():
     app.config['TESTING'] = True
     with app.test_client() as client:
