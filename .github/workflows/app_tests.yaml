@@ -59,7 +59,3 @@ jobs:
         context: ./app
         push: true
         tags: lironderi/market-app:latest
-
-    - name: Trigger Argo CD Webhook
-      run: |
-        curl -X POST webhoo-service.argocd.svc.cluster.local:8080 -d '{"event": "sync"}'
