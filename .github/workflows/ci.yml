@@ -32,7 +32,7 @@ jobs:
     - name: Run the application
       run: |
         export FLASK_APP= main.py
-        flask run
+        flask run &
 
     - name: Run Python tests
       run: pytest
