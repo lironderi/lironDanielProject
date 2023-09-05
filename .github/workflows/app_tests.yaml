@@ -33,7 +33,8 @@ jobs:
     - name: run app
       env: 
         FLASK_APP: ${{ env.FLASK_APP }}
-      run: | 
+      run: |
+        export FLASK_APP = $FLASK_APP
         $(flask run)
 
     - name: Run Python tests
