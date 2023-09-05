@@ -30,7 +30,8 @@ jobs:
         pip install pytest
 
     - name: run the app
-      environment: ${{ vars.FLASK_APP}}
+      env:
+        FLASK_APP: ${{ env.FLASK_APP }}
       run: |
         flask run
 
