@@ -29,13 +29,11 @@ jobs:
         pip install -r app/requirements.txt
         pip install pytest
 
-    # - name: Run the application
-    #   run: |
-        
-
-    - name: Run Python tests
+    - name: Run the application
       run: |
         cd app
         export FLASK_APP=main.py
         flask run &
-        pytest
+
+    - name: Run Python tests
+      run: pytest
