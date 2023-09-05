@@ -22,7 +22,10 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
-        
+
+    - name: mongo-svc
+      uses: art049/mongodb-cluster-action@v0
+
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
