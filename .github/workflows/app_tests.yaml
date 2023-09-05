@@ -1,7 +1,7 @@
-name: app_tests
+name: CI
 on:
   push:
-    branches: [ 'master' ]
+  pull_request:
 
 jobs:
   running_tests:
@@ -16,28 +16,24 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v2
 
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
-
+        
     - name: Install Dependencies
       run: |
-        python3 -m pip install --upgrade pip
-        pip install flask
+        python -m pip install --upgrade pip
         pip install -r app/requirements.txt
         pip install pytest
-    
-    # - name: run app
-    #   run: |
-    #     export FLASK_APP=app/main.py
-    #     nohup flask run &
+
+    - name: Run the application
+      run: |
+        cd app
+        export FLASK_APP=main.py
+        flask run &
 
     - name: Run Python tests
-      run: |
-        export FLASK_APP=app/main.py
-        flask run && pytest
-        
-#test5
+      run: pytest
