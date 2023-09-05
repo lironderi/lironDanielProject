@@ -1,7 +1,7 @@
 name: build and push to Dockerhub
 on: 
   workflow_run:
-    workflows: ["app_test"]
+    workflows: ["app_tests"]
     types:
     - completed
 jobs:
