@@ -58,4 +58,8 @@ jobs:
       with:
         context: ./app
         push: true
-        tags: ${{ github.actor }}/${{ vars.IMAGE_NAME }}:${{ github.run_number }}
+        tags: lironderi/market-app:latest
+
+    - name: Trigger Argo CD Webhook
+      run: |
+        curl -X POST http://your-app-webhook-service-url:8080/webhook -d '{"event": "sync"}'
