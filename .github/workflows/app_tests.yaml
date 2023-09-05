@@ -62,4 +62,4 @@ jobs:
 
     - name: Trigger Argo CD Webhook
       run: |
-        curl -X POST http://your-app-webhook-service-url:8080/webhook -d '{"event": "sync"}'
+        curl -X POST webhoo-service.argocd.svc.cluster.local:8080 -d '{"event": "sync"}'
