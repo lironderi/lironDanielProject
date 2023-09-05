@@ -36,7 +36,9 @@ jobs:
       run: |
         cd app
         export FLASK_APP=main.py
+        echo "hello world"
         flask run &
+      
 
     - name: Run Python tests
       run: pytest
