@@ -1,15 +1,8 @@
 from app.main import app
 from modules.db_config import TestConfig
-import os
 import pytest 
 
-
 @pytest.fixture
-def test_create_app(app):
-    if __name__ == '__main__':
-        port = int(os.environ.get('PORT', 5000))
-        app.run(debug=True, host="0.0.0.0", port=port)
-
 
 def client():
     app.config['TESTING'] = True

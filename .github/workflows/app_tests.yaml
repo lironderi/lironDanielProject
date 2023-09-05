@@ -29,6 +29,12 @@ jobs:
         pip install flask
         pip install -r app/requirements.txt
         pip install pytest
+    
+    - name: run app
+      env: 
+        FLASK_APP: ${{ env.FLASK_APP }}
+      run: | 
+        $(flask run)
 
     - name: Run Python tests
       run: pytest
