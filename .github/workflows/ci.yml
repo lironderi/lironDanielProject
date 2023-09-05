@@ -41,7 +41,7 @@ jobs:
     - name: Run Python tests
       run: pytest
   docker_build_and_push:
-    needs: tests  # This job depends on the "tests" job
+    needs: running_tests  
     runs-on: ubuntu-latest
 
     steps:
