@@ -30,12 +30,6 @@ jobs:
         pip install -r app/requirements.txt
         pip install pytest
 
-    - name: run the app
-      env:
-        FLASK_APP: app/main.py
-      run: |
-        flask run
-
     - name: Run Python tests
       run: pytest
 #test1
