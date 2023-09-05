@@ -58,4 +58,4 @@ jobs:
       with:
         context: ./app
         push: true
-        tags: ${{ github.actor }}/${{ env.IMAGE_NAME }}:${{ github.run_number }}
+        tags: ${{ github.actor }}/${{ vars.IMAGE_NAME }}:${{ github.run_number }}
