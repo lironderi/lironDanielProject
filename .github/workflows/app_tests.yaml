@@ -31,7 +31,7 @@ jobs:
 
     - name: run the app
       env:
-        FLASK_APP: ${{ env.FLASK_APP }}
+        FLASK_APP: main.py
       run: |
         flask run
 
