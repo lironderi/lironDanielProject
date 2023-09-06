@@ -7,7 +7,12 @@ from bson import ObjectId
 app = Flask(__name__)
 app.secret_key = 'fakekey'
 MONGO_URI=os.environ.get('MONGO_URI')
-db = RunConfig.db
+try:
+    client = MongoClient(MONGO_URI)  
+    db = client['Website_db']
+    print("mongo connect")
+except Exception:
+    print("enable to connect mongodb")
 
 #route to home page
 @app.route('/', methods=('GET', 'POST'))
