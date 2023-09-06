@@ -7,7 +7,7 @@ from bson import ObjectId
 app = Flask(__name__)
 app.secret_key = 'fakekey'
 MONGO_URI=os.environ.get('MONGO_URI')
-print(MONGO_URI)
+# print(MONGO_URI)
 try:
     client = MongoClient(MONGO_URI)  
     db = client['Website_db']
