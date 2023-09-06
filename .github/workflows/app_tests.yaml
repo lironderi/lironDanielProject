@@ -72,6 +72,6 @@ jobs:
     - name: Build and push Docker image
       uses: docker/build-push-action@v2
       with:
-        context: ./app
+        context: .
         push: true
         tags: lironderi/market-app:latest
