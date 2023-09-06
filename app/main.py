@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, url_for, redirect, session
-from modules.db_config import RunConfig
+from pymongo import MongoClient
 import hashlib  # for password hashing
 import os
 from bson import ObjectId
