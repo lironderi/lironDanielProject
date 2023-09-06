@@ -71,6 +71,7 @@ jobs:
         pwd
         cd project_conf
         echo "Trigger change" >> trigger.txt
+        sed -i "s|image: lironderi/market-app:v1.0.*|image: lironderi/market-app:v1.0.${{ github.run_id }}|" k8s/deployment.yaml
         git add trigger.txt
         git commit -m "Trigger ArgoCD Sync"
         git push https://${{ secrets.GH_PAT }}@github.com/danielsagie/project_conf.git
