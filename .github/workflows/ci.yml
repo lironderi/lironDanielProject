@@ -60,7 +60,7 @@ jobs:
       with:
         context: ./app
         push: true
-        tags: lironderi/market-app:latest
+        tags: lironderi/market-app:v1.0.${{ github.run_id }}
 
     - name: Trigger ArgoCD Sync
       run: |
