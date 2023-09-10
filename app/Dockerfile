@@ -1,5 +1,4 @@
 FROM python:3.9
-COPY . /app
 WORKDIR /app
 COPY ./app .
 COPY app/requirements.txt .
