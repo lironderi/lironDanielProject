@@ -1,8 +1,7 @@
 FROM python:3.9
 WORKDIR /app
-COPY ./app .
-COPY ./modules .
-COPY ./app/requirements.txt .
+COPY . .
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 ENV FLASK_APP main.py
 ENV PORT 5000

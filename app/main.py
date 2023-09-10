@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, url_for, redirect, session
-from modules.db_config import RunConfig
+from pymongo import MongoClient
 import hashlib  # for password hashing
 import os
 from bson import ObjectId
@@ -7,8 +7,12 @@ from bson import ObjectId
 app = Flask(__name__)
 app.secret_key = 'fakekey'
 MONGO_URI=os.environ.get('MONGO_URI')
-db = RunConfig.db
-
+try:
+    client = MongoClient(MONGO_URI)  
+    db = client['Website_db']
+    print("mongo connect")
+except Exception:
+    print("enable to connect mongodb")
 #route to home page
 @app.route('/', methods=('GET', 'POST'))
 @app.route('/home', methods=('GET', 'POST'))
