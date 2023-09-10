@@ -1,23 +1,7 @@
-name: app test
+name: CI #test3
 on:
   push:
   pull_request:
-  workflow_dispatch:
-      inputs:
-       workflow_02:
-         description: 'ًWorkflow 2 which will be triggered'
-         required: true
-         default: 'workflow_02'
- 
-       workflow2_github_account:
-         description: 'lironderi'
-         required: true
-         default: 'lironderi'
- 
-       workflow2_repo_github:
-         description: 'repo-name'
-         required: true
-         default: 'project_conf'
 
 jobs:
   running_tests:
@@ -51,7 +35,9 @@ jobs:
       run: |
         cd app
         export FLASK_APP=main.py
+        echo "hello world!"
         flask run &
+      
 
     - name: Run Python tests
       run: pytest
@@ -72,6 +58,20 @@ jobs:
     - name: Build and push Docker image
       uses: docker/build-push-action@v2
       with:
-        context: .
+        context: ./app
         push: true
-        tags: lironderi/market-app:latest
+        tags: lironderi/market-app:v1.0.${{ github.run_id }}
+
+    - name: Trigger ArgoCD Sync
+      run: |
+        git clone https://github.com/lironderi/project_conf
+        git config --global user.email "liron.deri3@outlook.com"
+        git config --global user.name "lironderi"
+        pwd
+        cd project_conf
+        echo "Trigger change" >> trigger.txt
+        sed -i "s|image: lironderi/market-app:v1.0.*|image: lironderi/market-app:v1.0.${{ github.run_id }}|" k8s_conf/deployment.yaml
+        git add trigger.txt
+        git add k8s_conf/deployment.yaml
+        git commit -m "Trigger ArgoCD Sync"
+        git push https://${{ secrets.GH_PAT }}@github.com/lironderi/project_conf
