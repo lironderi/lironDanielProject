@@ -168,6 +168,9 @@ def submit_list():
     if user:
         list_name = request.form.get('list_name')
         if list_name:
+            existing_list = db[f"{user['username']}_lists"].find_one({"name": list_name})
+            if existing_list:
+                return "List name already exists. Please choose a different name.", 400
             list_collection = db[f"{user['username']}_lists"]
             list_collection.insert_one({"name": list_name})
             return "List saved successfully"
