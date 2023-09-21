@@ -94,15 +94,15 @@ def new_list_page():
     first = session.get('first_login')
     if first:
         if request.method == 'POST':
-            return redirect(url_for('my_list'))  # Redirect to my_list after creating a new list
-        user_items_collection = db[first['_id']]  # Use the user's id as collection name
-        items = user_items_collection.find()  # Retrieve all items from the collection
+            return redirect(url_for('my_list'))  
+        user_items_collection = db[first['_id']] 
+        items = user_items_collection.find() 
         return render_template('new_list.html', user=first, items=items)
     elif user:
         if request.method == 'POST':
-            return redirect(url_for('my_list'))  # Redirect to my_list after creating a new list
-        user_items_collection = db[user['_id']]  # Use the user's id as collection name
-        items = user_items_collection.find()  # Retrieve all items from the collection
+            return redirect(url_for('my_list'))  
+        user_items_collection = db[user['_id']]  
+        items = user_items_collection.find()
         return render_template('new_list.html', user=user, items=items)
     else:
         return redirect(url_for('login_page'))
