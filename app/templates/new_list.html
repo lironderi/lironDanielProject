@@ -237,9 +237,23 @@ xnugget info
 
   .container {
     display: flex;
+    flex-direction: column;
     justify-content: flex-start;
-    align-items: flex-start;
-    height: 100vh;
+    align-items: center;
+    /* Center horizontally */
+    max-width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 4px;
+  }
+
+  h1 {
+    font-size: 36px;
+    /* Increase the font size */
+    text-align: center;
+    /* Center-align the text */
+    margin-top: 20px;
+    /* Add some top margin for spacing */
   }
 
   .table td,
@@ -260,14 +274,14 @@ xnugget info
   }
 
   .marked td::after {
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      background-color: #b52626;
-      transform: translateY(-50%);
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #b52626;
+    transform: translateY(-50%);
   }
 
 
@@ -440,148 +454,189 @@ xnugget info
 </style>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+
   document.addEventListener("DOMContentLoaded", function () {
-      const tableBody = document.querySelector(".table tbody");
-      const yesButton = document.getElementById("yes-button");
-      const noButton = document.getElementById("no-button");
-      const container = document.querySelector(".container");
-      const finishButton = document.getElementById("finish-button");
-      
+    const container = document.querySelector(".container");
+    const listId = "{{ list_data._id }}"; // Get the list ID from your template
 
-      container.addEventListener("click", function (event) {
-        if (event.target.classList.contains("mark-square")) {
+    container.addEventListener("click", function (event) {
+      if (event.target.classList.contains("deletebtn")) {
+        const action = event.target.getAttribute("data-action");
+
+        if (action === "delete") {
+          // Perform the delete action
           const row = event.target.closest("tr");
-          row.classList.toggle("marked");
-        }
-      });
-        yesButton.addEventListener("click", function (event) {
+          const rowId = row.getAttribute("data-row-id");
 
-          const user = "{{ user.username }}";  // Get the username from the template context
-          const dataRows = document.querySelectorAll(".data-row");
-          const formData = [];
-          dataRows.forEach(row => {
-            const item = row.querySelector("input[name='item']").value;
-            const quantity = row.querySelector("input[name='quantity']").value;
-
-            if (item && quantity) {
-              formData.push({ item, quantity });
-            }
-          });
-
-
-          fetch("/save-items", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ user: user, items: formData }),
+          fetch(`/delete_item/${rowId}/${listId}`, {
+            method: "DELETE",
           })
-            .then(response => response.json())
-            .then(data => {
-              console.log(data);  // Handle the response from the server if needed
+            .then((response) => {
+              if (response.ok) {
+                row.remove();
+              } else {
+                console.error("Failed to delete item");
+              }
             })
-            .catch(error => {
+            .catch((error) => {
               console.error("Error:", error);
             });
-        });
-      
+        } else if (action === "save") {
+          // Perform the save action (if needed)
+          // You can add your save logic here
+        }
+      }
+    });
+  });
+  document.addEventListener("DOMContentLoaded", function () {
+    const tableBody = document.querySelector(".table tbody");
+    const yesButton = document.getElementById("yes-button");
+    const noButton = document.getElementById("no-button");
+    const container = document.querySelector(".container");
+    const finishButton = document.getElementById("finish-button");
+    const listId = "{{ list_data._id }}";
 
 
+    yesButton.addEventListener("click", function (event) {
 
-      container.addEventListener("keydown", function (event) {
-        if (event.key === "Enter" && event.target.classList.contains("data-input")) {
-          event.preventDefault(); // Prevent the default behavior (form submission)
-          const newRow = createEmptyRow();
-          const currentRow = event.target.closest(".data-row");
-          const nextRow = currentRow.nextElementSibling;
+      const user = "{{ user.username }}";  // Get the username from the template context
+      const dataRows = document.querySelectorAll(".data-row");
+      const formData = []; // Initialize an array to store form data
 
-          if (nextRow) {
-            nextRow.before(newRow);
-          } else {
-            currentRow.parentNode.appendChild(newRow);
-          }
+      // Loop through all rows with class "data-row"
+      document.querySelectorAll(".data-row").forEach(function (row) {
+        const itemInput = row.querySelector("input[name='item']");
+        const quantityInput = row.querySelector("input[name='quantity']");
 
-          newRow.querySelector(".data-input").focus();
+        const item = itemInput.value.trim();
+        const quantity = quantityInput.value.trim();
+
+        if (item && quantity) {
+          formData.push({ item, quantity });
         }
       });
 
-
-      finishButton.addEventListener("click", function () {
-        // Show the popup when the "Finish" button is clicked
-        const popup = document.querySelector(".cd-popup");
-        popup.classList.add("is-visible");
-      });
-
-      //close popup
-      $('.cd-popup').on('click', function (event) {
-          if ($(event.target).is('.cd-popup-close') || $(event.target).is('.cd-popup')) {
-            event.preventDefault();
-            $(this).removeClass('is-visible');
+      // Send a POST request to save the items
+      fetch(`/save-items/${listId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ items: formData }),
+      })
+        .then(response => {
+          if (response.ok) {
+            // Handle success, e.g., redirect to a page or show a success message
+            window.location.href = "{{ url_for('new_list_page', list_id=list_data._id) }}";
+          } else {
+            // Handle error, e.g., show an error message
+            console.error('Failed to save items');
           }
-      });
-      //close popup when clicking the esc keyboard button
-      $(document).keyup(function (event) {
-          if (event.which == '27') {
-            $('.cd-popup').removeClass('is-visible');
-          }
-      });
+        })
+        .catch(error => {
+          console.error("Error:", error);
+        });
+    });
 
-      function createEmptyRow() {
-          const newRow = document.createElement("tr");
-          newRow.classList.add("data-row");
-          newRow.innerHTML = `
+
+
+
+    container.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" && event.target.classList.contains("data-input")) {
+        event.preventDefault(); // Prevent the default behavior (form submission)
+        const newRow = createEmptyRow();
+        const currentRow = event.target.closest(".data-row");
+        const nextRow = currentRow.nextElementSibling;
+
+        if (nextRow) {
+          nextRow.before(newRow);
+        } else {
+          currentRow.parentNode.appendChild(newRow);
+        }
+
+        newRow.querySelector(".data-input").focus();
+      }
+    });
+
+
+    finishButton.addEventListener("click", function () {
+      // Show the popup when the "Finish" button is clicked
+      const popup = document.querySelector(".cd-popup");
+      popup.classList.add("is-visible");
+    });
+
+    //close popup
+    $('.cd-popup').on('click', function (event) {
+      if ($(event.target).is('.cd-popup-close') || $(event.target).is('.cd-popup')) {
+        event.preventDefault();
+        $(this).removeClass('is-visible');
+      }
+    });
+    //close popup when clicking the esc keyboard button
+    $(document).keyup(function (event) {
+      if (event.which == '27') {
+        $('.cd-popup').removeClass('is-visible');
+      }
+    });
+
+    function createEmptyRow() {
+      const newRow = document.createElement("tr");
+      newRow.classList.add("data-row");
+      newRow.innerHTML = `
               <td><input class="data-input" type="text" name="item"></td>
               <td><input class="data-input" type="text" name="quantity"></td>
               <td><div class="mark-square"></div></td>
           `;
-          return newRow;
-      }
+      return newRow;
+    }
+
+
 
   });
 
 </script>
-
+<h1>List: {{ name }}</h1>
 <div class="container">
-  <form id="item-form">
-      <table class="table table-bordered table-dark">
-        <thead>
-          <tr>
-            <th>Item</th>
-            <th>Quantity</th>
-            <th>MARK</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for item in items %}
-          <tr>
-            <td>{{ item.item }}</td>
-            <td>{{ item.quantity }}</td>
-            <td>
-              <div class="mark-square"></div>
-            </td>
-          </tr>
-          {% endfor %}
-          <tr class="data-row">
-            <td><input class="data-input" type="text" name="item"></td>
-            <td><input class="data-input" type="text" name="quantity"></td>
-            <td>
-              <div class="mark-square"></div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+  <form id="item-form" action="{{ url_for('save_items', list_id=list_data._id) }}" method="POST">
+    <table class="table table-bordered table-dark">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Quantity</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+        <tr data-row-id="{{ item_ids[loop.index0] }}">
+          <td>{{ item.item }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>
+            <button type="button" class="deletebtn" data-action="delete">Delete</button>
+          </td>
+        </tr>
+        {% endfor %}
+        <tr class="data-row">
+          <td><input class="data-input" type="text" name="item"></td>
+          <td><input class="data-input" type="text" name="quantity"></td>
+          <td>
+            <button type="button" class="deletebtn">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </form>
-    <button id="finish-button" class="btn btn-primary">Finish</button>
-  
+  <button id="finish-button" class="btn btn-primary">Finish</button>
+
 </div>
 
 <div class="cd-popup" role="alert">
   <div class="cd-popup-container">
     <p>Save items to My List?</p>
     <ul class="cd-buttons">
-      <li><a href="{{ url_for('my_list')}}" id="yes-button">Yes</a></li>
+      <li><a href="{{ url_for('new_list_page', list_id=list_data._id) }}" id="yes-button">Yes</a></li>
     </ul>
-    <a href="#0"  class="cd-popup-close img-replace">Close</a>
+    <a href="#0" class="cd-popup-close img-replace">Close</a>
   </div> <!-- cd-popup-container -->
 </div> <!-- cd-popup -->
 
