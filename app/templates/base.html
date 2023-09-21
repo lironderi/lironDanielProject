@@ -36,7 +36,7 @@
             </li>
           </ul>
           <ul class="navbar-nav">
-            {% if session['login_user'] %}
+            {% if session['login_user'] or session['first_login'] %}
               <li class="nav-item">
                <a class="nav-link" href="{{ url_for('my_list') }}">My List</a>
               </li>
@@ -46,8 +46,10 @@
               <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
               </li>
-              
             {% else %}
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('create_account') }}">Register</a>
+              </li>
               <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('login_page') }}">Login</a>
               </li>
