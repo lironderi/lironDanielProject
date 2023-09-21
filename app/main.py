@@ -199,6 +199,11 @@ def logout():
         session.pop('login_user', None)
     return redirect(url_for('home_page'))
 
+
+@app.route('/create_list')
+def create_list():
+    return render_template('create_list.html')
+
 def create_app(app):
     if __name__ == '_main_':
         port = int(os.environ.get('PORT', 5000))
