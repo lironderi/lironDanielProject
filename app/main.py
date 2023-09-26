@@ -172,8 +172,11 @@ def submit_list():
             if existing_list:
                 return "List name already exists. Please choose a different name.", 400
             list_collection = db[f"{user['username']}_lists"]
-            list_collection.insert_one({"name": list_name})
-            return "List saved successfully"
+            # list_collection.insert_one({"name": list_name})
+            new_list = list_collection.insert_one({"name": list_name})
+            new_list_id = new_list.inserted_id
+
+            return jsonify({"message": "List saved successfully", "list_id": str(new_list_id)})
         else:
             return "List name is empty", 400
     else:
@@ -206,6 +209,16 @@ def list_page(list_id):
     else:
         return redirect(url_for('login_page'))
 
+
+@app.route('/delete_list/<list_id>', methods=['DELETE'])
+def delete_list(list_id):
+    user = session.get('login_user')
+    if user:
+        db.drop_collection(list_id)
+        db[f"{user['username']}_lists"].delete_one({'_id': ObjectId(list_id)})
+        return jsonify({'message': 'List deleted successfully'})
+
+    return jsonify({'message': 'List not found'}), 404
 
 def create_app(app):
     if __name__ == '__main__':

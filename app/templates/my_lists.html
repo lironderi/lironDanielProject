@@ -75,6 +75,7 @@ List page
             flex-wrap: wrap;
         }
 
+
         .list-button {
             background-color: #04ea9d6b;
             color: white;
@@ -84,8 +85,10 @@ List page
             cursor: pointer;
             margin-right: 10px;
             margin-bottom: 10px;
-            display: block;
+            display: flex;
+            align-items: center; /* Center text vertically within the button */
         }
+
     </style>
 </head>
 
@@ -98,7 +101,9 @@ List page
         </div>
         <div class="lists">
             {% for list in lists %}
-            <a href="{{ url_for('new_list_page', list_id=list._id) }}" class="list-button">{{ list.name }}</a>
+                <a href="{{ url_for('new_list_page', list_id=list._id) }}" class="list-button">
+                    <span>{{ list.name }}</span>
+                </a>
             {% endfor %}
         </div>
     </div>
@@ -145,25 +150,26 @@ List page
         })
             .then(response => {
                 if (response.ok) {
-                    // List saved successfully, you can update the UI as needed
-                    // For example, create and append the list item (button) to the container
+                    return response.json(); // Parse the response as JSON
+                } else {
+                    // Handle error response
+                    console.error('Failed to save list:', response.statusText);
+                }
+            })
+            .then(data => {
+                if (data && data.list_id) {
                     const listButton = document.createElement('button');
                     listButton.textContent = newListName;
                     listButton.classList.add('list-button');
                     // Add a click event listener to redirect to the list when clicked
                     listButton.addEventListener('click', () => {
-                        // Redirect logic goes here
-                        // You can use window.location.href to redirect to the specific list page
-                        // For example: window.location.href = `/list/${list.id}`;
+                        window.location.href = `/new_list/${data.list_id}`; // Use data.list_id
                     });
                     const listsContainer = document.querySelector('.lists');
                     listsContainer.appendChild(listButton);
 
                     // Clear the input field after saving
                     newListInput.value = '';
-                } else {
-                    // Handle error response
-                    console.error('Failed to save list:', response.statusText);
                 }
             })
             .catch(error => {
