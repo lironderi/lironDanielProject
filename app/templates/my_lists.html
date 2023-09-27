@@ -179,19 +179,29 @@ List page
             })
             .then(data => {
                 if (data && data.list_id) {
-                    const listButton = document.createElement('button');
-                    listButton.textContent = newListName;
-                    listButton.classList.add('list-button');
-                    // Add a click event listener to redirect to the list when clicked
-                    listButton.addEventListener('click', () => {
-                        window.location.href = `/new_list/${data.list_id}`; // Use data.list_id
-                    });
                     const listsContainer = document.querySelector('.lists');
+                    const listButton = document.createElement('a');
+                    listButton.href = `/new_list/${data.list_id}`;
+                    listButton.classList.add('list-button');
+
+                    const listNameSpan = document.createElement('span');
+                    listNameSpan.textContent = newListName;
+
+                    const removeListButton = document.createElement('div');
+                    removeListButton.classList.add('remove-list');
+                    removeListButton.textContent = 'x';
+                    removeListButton.setAttribute('data-list-id', data.list_id);
+
+                    listButton.appendChild(listNameSpan);
+                    listButton.appendChild(removeListButton);
+
                     listsContainer.appendChild(listButton);
 
                     // Clear the input field after saving
                     newListInput.value = '';
-                }
+
+                    }
+                    
             })
             .catch(error => {
                 console.error('Error:', error);
