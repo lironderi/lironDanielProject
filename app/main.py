@@ -101,7 +101,6 @@ def new_list_page(list_id):
         else:
             name = None
         items_collection = db[list_id]
-                # Fetch items from the list's collection
         items = list(items_collection.find())
         item_ids = [str(item['_id']) for item in items]
         return render_template('new_list.html', user=user, name=name,list_data=list_data, items=items, item_ids=item_ids)
@@ -129,8 +128,8 @@ def get_items():
 def save_items(list_id):
     user = session.get('login_user')
     if user:
-        list_collection = db[f"{user['username']}_lists"]
-        list_data = list_collection.find_one({"_id": ObjectId(list_id)})
+        lists_collection = db[f"{user['username']}_lists"]
+        list_data = lists_collection.find_one({"_id": ObjectId(list_id)})
 
         if list_data:
             data = request.json
@@ -171,10 +170,11 @@ def submit_list():
             existing_list = db[f"{user['username']}_lists"].find_one({"name": list_name})
             if existing_list:
                 return "List name already exists. Please choose a different name.", 400
-            list_collection = db[f"{user['username']}_lists"]
-            # list_collection.insert_one({"name": list_name})
-            new_list = list_collection.insert_one({"name": list_name})
+            lists_collection = db[f"{user['username']}_lists"]
+            new_list = lists_collection.insert_one({"name": list_name})
             new_list_id = new_list.inserted_id
+            list_collection = str(new_list_id)
+            db.create_collection(list_collection)
 
             return jsonify({"message": "List saved successfully", "list_id": str(new_list_id)})
         else:
@@ -187,8 +187,8 @@ def submit_list():
 def my_lists():
     user = session.get('login_user')
     if user:
-        list_collection = db[f"{user['username']}_lists"]
-        lists = list(list_collection.find())
+        lists_collection = db[f"{user['username']}_lists"]
+        lists = list(lists_collection.find())
         for item in lists:
             item['_id'] = str(item['_id'])
         return render_template('my_lists.html', lists=lists, user=user)
@@ -200,8 +200,8 @@ def my_lists():
 def list_page(list_id):
     user = session.get('login_user')
     if user:
-        list_collection = db[f"{user['username']}_lists"]
-        list_data = list_collection.find_one({"_id": ObjectId(list_id)})
+        lists_collection = db[f"{user['username']}_lists"]
+        list_data = lists_collection.find_one({"_id": ObjectId(list_id)})
         if list_data:
             return render_template('new_list.html', user=user, list_data=list_data)
         else:

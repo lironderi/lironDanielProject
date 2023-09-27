@@ -482,8 +482,7 @@ xnugget info
               console.error("Error:", error);
             });
         } else if (action === "save") {
-          // Perform the save action (if needed)
-          // You can add your save logic here
+          
         }
       }
     });
@@ -527,7 +526,7 @@ xnugget info
         .then(response => {
           if (response.ok) {
             // Handle success, e.g., redirect to a page or show a success message
-            window.location.href = "{{ url_for('new_list_page', list_id=list_data._id) }}";
+            window.location.href = "{{ url_for('new_list_page', list_id=list_data._id, items=items) }}";
           } else {
             // Handle error, e.g., show an error message
             console.error('Failed to save items');
