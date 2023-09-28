@@ -65,8 +65,8 @@ jobs:
     - name: Trigger ArgoCD Sync
       run: |
         git clone https://github.com/lironderi/project_conf
-        git config --global user.email ${{ secrets.LIRON_EMAIL }}
-        git config --global user.name ${{ secrets.LIRON_USERNAME }}
+        git config --global user.email "liron.deri3@outlook.com"
+        git config --global user.name "lironderi"
         pwd
         cd project_conf
         echo "Trigger change" >> trigger.txt
