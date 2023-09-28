@@ -70,6 +70,7 @@ List page
             margin-top: 20px;
             display: flex;
             flex-wrap: wrap;
+            text-decoration: none;
         }
 
         .list-button {
@@ -84,12 +85,9 @@ List page
             display: flex;
             align-items: center;
             justify-content: space-between;
-        }
-
-        /* Remove underline for anchor elements inside .list-button */
-        .list-button a {
             text-decoration: none;
         }
+
 
         /* Style the "x" sign separately */
         .list-button .remove-list {
@@ -97,16 +95,19 @@ List page
             margin-left: 10px;
             color: rgb(255, 255, 255);
             transition: color 0.2s;
+            text-decoration: none;
         }
 
         /* Change the color of the list name on hover */
-        .list-button:hover a {
-            color: rgb(255, 255, 255);
+        .list-button:hover .list-name {
+            color: rgba(67, 77, 123, 0.456);
+            text-decoration: none;
         }
 
         /* Change the color of the "x" sign on hover */
         .list-button:hover .remove-list {
             color: rgb(255, 0, 0); /* Change to your desired color */
+            text-decoration: none;
         }
 
     </style>
@@ -121,10 +122,10 @@ List page
         </div>
         <div class="lists">
             {% for list in lists %}
-                <a href="{{ url_for('new_list_page', list_id=list._id) }}" class="list-button">
-                    <span>{{ list.name }}</span>
-                    <div class="remove-list" data-list-id="{{ list._id }}">x</div>
-                </a>
+                <div class="list-button" data-list-id="{{ list._id }}">
+                    <span data-list-id="{{ list._id }}" class="list-name">{{ list.name }}</span>
+                    <div data-list-id="{{ list._id }}" class="remove-list">x</div>
+                </div>
             {% endfor %}
         </div>
     </div>
@@ -132,20 +133,65 @@ List page
 </body>
 <script>
     
+    function deleteList(listId) {
+        fetch(`/delete_list/${listId}`, {
+            method: 'DELETE',
+        })
+            .then(response => {
+                if (response.ok) {
+                    const listButton = document.querySelector(`[data-list-id="${listId}"]`);
+                    if (listButton) {
+                        listButton.remove();
+                    }
+                } else {
+                    // Handle error response
+                    console.error('Failed to delete list:', response.statusText);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    // Function to create list buttons
     function createListButtons() {
         const listsContainer = document.querySelector('.lists');
 
         // Use listsFromServer instead of listsFromDatabase
         listsFromServer.forEach(list => {
-            const listButton = document.createElement('button');
-            listButton.textContent = list.name;
+            const listButton = document.createElement('div');
             listButton.classList.add('list-button');
+            listButton.setAttribute('data-list-id', list.id);
 
-            // Add a click event listener to redirect to the list when clicked
-            listButton.addEventListener('click', () => {
-                // Redirect to the list page with the list_id parameter
-                window.location.href = `/new_list/${list.id}`;
+            const listNameSpan = document.createElement('span');
+            listNameSpan.textContent = list.name;
+            listNameSpan.setAttribute('data-list-id', list.id);
+
+            const removeListButton = document.createElement('div');
+            removeListButton.classList.add('remove-list');
+            removeListButton.textContent = 'x';
+            removeListButton.setAttribute('data-list-id', list.id);
+
+            removeListButton.addEventListener('click', event => {
+                event.stopPropagation();
+                const listId = event.target.getAttribute('data-list-id');
+                deleteList(listId);
             });
+
+            listNameSpan.addEventListener('click', event => {
+                const listId = event.target.getAttribute('data-list-id');
+                window.location.href = `/new_list/${listId}`;
+            });
+            listNameSpan.addEventListener('mouseenter', () => {
+                listNameSpan.style.color = 'rgba(67, 77, 123, 0.456)';
+            });
+
+            listNameSpan.addEventListener('mouseleave', () => {
+                listNameSpan.style.color = 'white';
+            });
+
+            listButton.appendChild(listNameSpan);
+            listButton.appendChild(removeListButton);
 
             listsContainer.appendChild(listButton);
         });
@@ -180,17 +226,36 @@ List page
             .then(data => {
                 if (data && data.list_id) {
                     const listsContainer = document.querySelector('.lists');
-                    const listButton = document.createElement('a');
-                    listButton.href = `/new_list/${data.list_id}`;
+                    const listButton = document.createElement('div');
                     listButton.classList.add('list-button');
+                    listButton.setAttribute('data-list-id', data.list_id);
 
                     const listNameSpan = document.createElement('span');
                     listNameSpan.textContent = newListName;
+                    listNameSpan.setAttribute('data-list-id', data.list_id);
 
                     const removeListButton = document.createElement('div');
                     removeListButton.classList.add('remove-list');
                     removeListButton.textContent = 'x';
                     removeListButton.setAttribute('data-list-id', data.list_id);
+
+                    removeListButton.addEventListener('click', event => {
+                        event.stopPropagation();
+                        const listId = event.target.getAttribute('data-list-id');
+                        deleteList(listId);
+                    });
+                    listNameSpan.addEventListener('mouseenter', () => {
+                        listNameSpan.style.color = 'rgba(67, 77, 123, 0.456)';
+                    });
+
+                    listNameSpan.addEventListener('mouseleave', () => {
+                        listNameSpan.style.color = 'white';
+                    });
+
+                    listNameSpan.addEventListener('click', event => {
+                        const listId = event.target.getAttribute('data-list-id');
+                        window.location.href = `/new_list/${listId}`;
+                    });
 
                     listButton.appendChild(listNameSpan);
                     listButton.appendChild(removeListButton);
@@ -199,20 +264,32 @@ List page
 
                     // Clear the input field after saving
                     newListInput.value = '';
-
-                    }
-                    
+                }
             })
             .catch(error => {
                 console.error('Error:', error);
             });
     }
 
+    const listsContainer = document.querySelector('.lists');
+    listsContainer.addEventListener('click', event => {
+        const target = event.target;
+        const listId = target.getAttribute('data-list-id');
+
+        if (target.classList.contains('remove-list')) {
+            event.stopPropagation(); // Prevent parent click event
+            deleteList(listId);
+        } else if (target.classList.contains('list-name')) {
+            window.location.href = `/new_list/${listId}`;
+        }
+    });
+
     // Call the function to create list buttons when the page loads
     document.addEventListener('DOMContentLoaded', createListButtons);
 
     const submitListButton = document.getElementById('submitListButton');
     submitListButton.addEventListener('click', saveNewList);
+
 </script>
 
 </html>
