@@ -584,7 +584,9 @@ xnugget info
       newRow.innerHTML = `
               <td><input class="data-input" type="text" name="item"></td>
               <td><input class="data-input" type="text" name="quantity"></td>
-              <td><div class="mark-square"></div></td>
+              <td>
+                <button type="button" class="deletebtn">Delete</button>
+              </td>
           `;
       return newRow;
     }
