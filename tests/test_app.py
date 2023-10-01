@@ -1,7 +1,7 @@
 from app.main import app
 from modules.db_config import TestConfig
-import pytest 
-# from pymongo import MongoClient
+import pytest
+from pymongo import MongoClient
 
 @pytest.fixture
 def client():

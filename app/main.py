@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, url_for, redirect, session, jsonify
 from pymongo import MongoClient
-from flask.json import JSONEncoder
+from json import JSONEncoder
 import hashlib 
 import os
 from bson import ObjectId
