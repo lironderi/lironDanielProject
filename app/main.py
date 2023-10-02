@@ -14,7 +14,7 @@ class CustomJSONEncoder(JSONEncoder):
 app = Flask(__name__)
 app.secret_key = 'fakekey'
 MONGO_URI=os.environ.get('MONGO_URI')
-app.json_encoder = CustomJSONEncoder
+# app.json_encoder = CustomJSONEncoder
 try:
     client = MongoClient(MONGO_URI)  
     db = client['Website_db']
