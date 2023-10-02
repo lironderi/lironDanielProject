@@ -1,8 +1,10 @@
 from flask import Flask, render_template, request, url_for, redirect, session, jsonify
+from flask.sessions import SessionInterface, SessionMixin
 from pymongo import MongoClient
 from json import JSONEncoder
 import hashlib 
 import os
+import json
 from bson import ObjectId
 
 class CustomJSONEncoder(JSONEncoder):
@@ -10,11 +12,39 @@ class CustomJSONEncoder(JSONEncoder):
         if isinstance(obj, ObjectId):
             return str(obj)
         return super().default(obj)
+    
+class CustomSessionInterface(SessionInterface):
+    def get_session(self, app, request):
+        session_data = request.cookies.get(app.session_cookie_name)
+        if not session_data:
+            return SessionMixin()
+
+        try:
+            session_data = json.loads(session_data)
+            # Deserialize ObjectId fields
+            for key, value in session_data.items():
+                if isinstance(value, str) and ObjectId.is_valid(value):
+                    session_data[key] = ObjectId(value)
+            return SessionMixin(session_data)
+        except Exception:
+            return SessionMixin()
+
+    def save_session(self, app, session, response):
+        if session.modified:
+            serialized_data = json.dumps(dict(session))
+            response.set_cookie(
+                app.session_cookie_name,
+                value=serialized_data,
+                expires=self.get_expiration_time(app, session),
+                httponly=True,
+                domain=self.get_cookie_domain(app),
+            )
 
 app = Flask(__name__)
 app.secret_key = 'fakekey'
 MONGO_URI=os.environ.get('MONGO_URI')
 app.json_encoder = CustomJSONEncoder
+app.session_interface = CustomSessionInterface()
 try:
     client = MongoClient(MONGO_URI)  
     db = client['Website_db']
