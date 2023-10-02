@@ -57,7 +57,7 @@ jobs:
           tags: lironderi/market-app:v1.0.${{ github.run_id }}
         id: Build_push
       - name: Trigger ArgoCD Sync
-        run: >
+        run: |
           git clone https://github.com/lironderi/project_conf
           git config --global user.email "liron.deri3@outlook.com"
           git config --global user.name "lironderi"
@@ -81,4 +81,4 @@ jobs:
           to: ${{vars.EMAIL}}
           subject: Workflow failed
           body: The workflow failed, please check this on github actions
-          #
+          
