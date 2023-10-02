@@ -1,6 +1,5 @@
 from app.main import app
 from modules.db_config import TestConfig
-from flask.sessions import SessionInterface, SessionMixin
 import pytest
 from pymongo import MongoClient
 from bson import ObjectId
